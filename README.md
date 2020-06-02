@@ -1,4 +1,4 @@
-![](https://img.shields.io/pypi/v/foliantcontrib.dbdoc.svg)
+[![](https://img.shields.io/pypi/v/foliantcontrib.dbdoc.svg)](https://pypi.org/project/foliantcontrib.dbdoc/)  [![](https://img.shields.io/github/v/tag/foliant-docs/foliantcontrib.dbdoc.svg?label=GitHub)](https://github.com/foliant-docs/foliantcontrib.dbdoc)
 
 # Database Documentation Generator for Foliant
 
@@ -17,7 +17,9 @@ DBDoc generates documentation by querying database structure. That's why you wil
 
 PostgreSQL will be installed automatically with the preprocessor.
 
-But Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags).
+But Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags). So, if you are planning on using DBDoc to document Oracle databases, first install the [Instant Client](https://www.oracle.com/database/technologies/instant-client.html).
+
+> If you search the web, you can find ways to install Oracle Instant Client inside your Docker image, just saying.
 
 ### Preprocessor
 
@@ -63,10 +65,10 @@ preprocessors:
 :   Database port. Default: `5432` for pgsql, `1521` for Oracle.
 
 `dbname`
-:   PostgreSQL database name. Default: `postgres` for pgsq, `orcl` for oracle.
+:   PostgreSQL database name. Default: `postgres` for pgsql, `orcl` for oracle.
 
 `user`
-:   PostgreSQL user name. Default: `postgres` for pgsq, `hr` for oracle.
+:   PostgreSQL user name. Default: `postgres` for pgsql, `hr` for oracle.
 
 `password`
 :   PostgreSQL user password. Default: `postgres` for pgsq, `oracle` for oracle.
