@@ -96,7 +96,7 @@ preprocessors:
 DBDoc currently supports two database engines: Oracle and PostgreSQL. To generate Oracle database documentation, add an `<oracle></oracle>` tag to a desired place of your chapter.
 
 
-```markdown
+```html
 # Introduction
 
 This document contains the most awesome automatically generated documentation of our marvellous Oracle database.
@@ -107,7 +107,7 @@ This document contains the most awesome automatically generated documentation of
 To generate PostgreSQL database documentation, add a `<pgsql></pgsql>` tag to a desired place of your chapter.
 
 
-```markdown
+```html
 # Introduction
 
 This document contains the most awesome automatically generated documentation of our marvellous Oracle database.
@@ -119,7 +119,7 @@ Each time the preprocessor encounters one of the mentioned tags, it inserts the 
 
 You can also specify some parameters (or all of them) in the tag options:
 
-```markdown
+```html
 # Introduction
 
 Introduction text for database documentation.
@@ -156,7 +156,7 @@ preprocessors:
 
 or in tag options using the same yaml-syntax:
 
-```markdown
+```html
 
 <pgsql filters="
   eq:
@@ -182,7 +182,7 @@ List of currently supported filtering fields:
 
 field | description
 ----- | -----------
-schema | filter by PostgreSQL database schema
+schema | filter by database schema
 table_name | filter by database table names
 
 The syntax for using filters in configuration files is following:
