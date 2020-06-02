@@ -17,8 +17,8 @@ def process(config, tag_options) -> str:
         'scheme': True,
         'host': 'localhost',
         'port': '1521',
-        'dbname': 'oracle',
-        'user': 'oracle',
+        'dbname': 'orcl',
+        'user': 'hr',
         'password': 'oracle',
         'components': [
             'tables',

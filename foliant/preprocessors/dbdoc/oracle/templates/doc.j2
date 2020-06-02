@@ -45,12 +45,12 @@ triggers (list) - list of dictionaries with info about triggers;
 {% for table in tables %}
 ## {{ table['TABLE_NAME'] }}
 
-{{ table['description'] }}
+{{ table['COMMENTS'] }}
 
 column | nullable | type | descr | fkey
 ------ | -------- | ---- | ----- | ----
 {% for col in table['columns'] -%}
-{{ col['COLUMN_NAME'] }} | {{ col['NULLABLE'] }} | {{ col['DATA_TYPE'] }} | {{ col['COMMENTS'] }} | 
+{{ col['COLUMN_NAME'] }} | {{ col['NULLABLE'] }} | {{ col['DATA_TYPE'] }} | {{ col['COMMENTS']|replace('\n', ' ') }} | 
 {%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['F_TABLE_NAME'] }}
 {%- endif %}{# {%- if col['foreign_keys']  %} #}
 {% endfor %}{# {% for col in table['columns'] -%} #}

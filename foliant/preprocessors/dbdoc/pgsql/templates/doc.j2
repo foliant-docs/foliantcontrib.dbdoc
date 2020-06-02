@@ -60,7 +60,7 @@ triggers (list) - list of dictionaries with info about triggers;
 column | nullable | type | descr | fkey
 ------ | -------- | ---- | ----- | ----
 {% for col in table['columns'] -%}
-{{ col['column_name'] }} | {{ col['is_nullable'] }} | {{ col['data_type'] }} | {{ col['description'] }} | 
+{{ col['column_name'] }} | {{ col['is_nullable'] }} | {{ col['data_type'] }} | {{ col['description']|replace('\n', ' ') }} | 
 {%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['foreign_table_name'] }}[{{ col['foreign_keys'][0]['foreign_column_name'] }}]
 {%- endif %}{# {%- if col['foreign_keys']  %} #}
 {% endfor %}{# {% for col in table['columns'] -%} #}

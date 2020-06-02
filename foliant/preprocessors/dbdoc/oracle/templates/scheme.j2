@@ -38,7 +38,7 @@ tables (list) - list of dictionaries with info about tables;
 {% for table in tables -%}
 {% for column in table['columns'] -%}
 {% for fk in column['foreign_keys'] %}
-{{ fk['TABLE_NAME']|indent }} : {{ fk['COLUMN_NAME'] }} --> {{ fk['F_TABLE_NAME'] }}
+{{ fk['TABLE_NAME']|indent }} --> {{ fk['F_TABLE_NAME'] }} : {{ fk['COLUMN_NAME'] }}
 {%- endfor -%}{# {% for fk in colulmn['foreign_keys'] %} #}
 {%- endfor -%}{# {% for column in table['columns'] %} #}
 {%- endfor -%}{# {% for table in tables %} #}

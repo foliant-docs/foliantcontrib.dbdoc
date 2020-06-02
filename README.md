@@ -11,6 +11,16 @@ Currently supported databases:
 
 ## Installation
 
+### Prerequisites
+
+DBDoc generates documentation by querying database structure. That's why you will need client libraries installed on your computer before running the preprocessor.
+
+PostgreSQL will be installed automatically with the preprocessor.
+
+But Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags).
+
+### Preprocessor
+
 ```bash
 $ pip install foliantcontrib.dbdoc
 ```
@@ -53,12 +63,12 @@ preprocessors:
 :   Database port. Default: `5432` for pgsql, `1521` for Oracle.
 
 `dbname`
-:   PostgreSQL database name. Default: `postgres` for pgsq, `oracle` for oracle.
+:   PostgreSQL database name. Default: `postgres` for pgsq, `orcl` for oracle.
 
 `user`
-:   PostgreSQL user name. Default: `postgres` for pgsq, `oracle` for oracle.
+:   PostgreSQL user name. Default: `postgres` for pgsq, `hr` for oracle.
 
-`passwrod`
+`password`
 :   PostgreSQL user password. Default: `postgres` for pgsq, `oracle` for oracle.
 
 `doc`
@@ -163,8 +173,8 @@ operator | SQL equivalent | description | value
 `not_eq` | `!=` | does not equal | literal
 `in` | `IN` | contains | list
 `not_in` | `NOT IN` | does not contain | list
-`regex` | `~` | matches regular expression | literal
-`not_regex` | `!~` | does not match regular expression | literal
+`regex` | `~`, `REGEX_LIKE` | matches regular expression | literal
+`not_regex` | `!~`, `NOT REGEX_LIKE` | does not match regular expression | literal
 
 List of currently supported filtering fields:
 
@@ -199,7 +209,8 @@ If you don't specify path to templates in the config-file and tag-options dbdoc 
 
 If you wish to create your own template, the default ones may be a good starting point.
 
-Default **Oracle doc** template.
-Default **Oracle scheme** template.
-Default **PostgreSQL doc** template.
-Default **PostgreSQL scheme** template.
+* [Default **Oracle doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/doc.j2)
+* [Default **Oracle scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/scheme.j2)
+* [Default **PostgreSQL doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
+* [Default **PostgreSQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql
+* /templates/doc.j2)
