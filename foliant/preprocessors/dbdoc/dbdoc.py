@@ -16,7 +16,7 @@ class Preprocessor(BasePreprocessorExt):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.logger = self.logger.getChild('pgsqldoc')
+        self.logger = self.logger.getChild('dbdoc')
 
         self.logger.debug(f'Preprocessor inited: {self.__dict__}')
 
