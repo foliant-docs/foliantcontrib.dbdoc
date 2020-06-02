@@ -1,0 +1,94 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'OWNER' (string) - table schema name;
+    'TABLE_NAME' (string) - table name;
+    'COMMENTS' (str) - table comment (description);
+    'columns' (list) - list of dictionaries with info about each column;
+        'TABLE_NAME' (string) - table name;
+        'COLUMN_ID' (integer) - position of the column in table definition;
+        'COLUMN_NAME' (string) - column name;
+        'NULLABLE' (string) - 'Y' if column is nullable, 'N' otherwise;
+        'DATA_TYPE' (string) - column data type;
+        'DATA_DEFAULT' (string) - default value of column or '' if there's no.
+        'DATA_LENGTH' (integer) - max length;
+        'DATA_PRECISION' (integer) — maximum number of digits in value.
+                                     For numeric values;
+        'COMMENTS' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'OWNER' (string) - constraint table schema;
+            'COLUMN_NAME' (string) - name of the fk column;
+            'CONSTRAINT_NAME' (string) - name of the constraint for this fk;
+            'TABLE_NAME' (string) - column table name;
+            'F_OWNER' (string) - schema of the referenced table;
+            'F_TABLE_NAME' (string) - name of the referenced table.
+
+functions (list) - list of dictionaries with info about stored functions;
+    'NAME' (string) - name of the function;
+    'TYPE' (string) - 'FUNCTION' or 'PROCEDURE';
+    'OWNER' (string) - schema where the function is declared;
+    'SOURCE' (string) - function source;
+
+triggers (list) - list of dictionaries with info about triggers;
+    'OWNER' (string) - schema where the trigger is declared;
+    'TRIGGER_NAME' (string) — name of the trigger;
+    'TRIGGER_TYPE' (string) — for example 'AFTER EACH ROW', 'BEFORE EVENT',
+                              'AFTER STATEMENT' etc.
+    'TRIGGERING_EVENT' (string) — which event is triggered ('INSERT',
+                                  'UPDATE OR DELETE', etc);
+    'TABLE_NAME' (string) — table for which the trigger is defined;
+#}
+
+# Tables
+
+{% for table in tables %}
+## {{ table['TABLE_NAME'] }}
+
+{{ table['description'] }}
+
+column | nullable | type | descr | fkey
+------ | -------- | ---- | ----- | ----
+{% for col in table['columns'] -%}
+{{ col['COLUMN_NAME'] }} | {{ col['NULLABLE'] }} | {{ col['DATA_TYPE'] }} | {{ col['COMMENTS'] }} | 
+{%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['F_TABLE_NAME'] }}
+{%- endif %}{# {%- if col['foreign_keys']  %} #}
+{% endfor %}{# {% for col in table['columns'] -%} #}
+{% endfor %}{# {% for table in tables %} #}
+
+{% if functions -%}
+# Functions
+
+{% for func in functions %}
+## {{ func['NAME'] }}
+
+**Schema**: {{ func['OWNER'] }}
+
+**Type**: {{ func['TYPE'] }}
+
+{% if func['SOURCE'] %}
+```sql
+{{ func['SOURCE'] }}
+```
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% if triggers -%}
+# Triggers
+
+{% for trig in triggers %}
+## {{ trig['TABLE_NAME'] }} on {{ trig['TRIGGERING_EVENT'] }}
+
+**Name**: {{ trig['TRIGGER_NAME']|indent }}
+
+**Schema**: {{ trig['OWNER'] }}
+
+**Table**: {{ trig['TABLE_NAME'] }}
+
+**Type**: {{ trig['TRIGGER_TYPE'] }}
+
+{% endfor %}{# {% for trig in triggers %} #}
+{% endif %}{# {% if triggers %} #}

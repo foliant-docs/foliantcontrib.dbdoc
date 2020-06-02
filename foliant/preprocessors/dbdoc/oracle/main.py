@@ -1,0 +1,194 @@
+import cx_Oracle
+
+from copy import deepcopy
+from jinja2 import Template
+from pkg_resources import resource_filename
+from foliant.preprocessors.utils.combined_options import CombinedOptions
+from logging import getLogger
+from .queries import (TablesQuery, ColumnsQuery, ForeignKeysQuery,
+                      FunctionsQuery, TriggersQuery)
+
+logger = getLogger('flt.dbdoc.pgsql')
+
+
+def process(config, tag_options) -> str:
+    defaults = {
+        'doc': True,
+        'scheme': True,
+        'host': 'localhost',
+        'port': '1521',
+        'dbname': 'oracle',
+        'user': 'oracle',
+        'password': 'oracle',
+        'components': [
+            'tables',
+            'functions',
+            'triggers'
+        ]
+    }
+    options = CombinedOptions(
+        {
+            'config': config,
+            'tag': tag_options
+        },
+        priority='tag',
+        defaults=defaults
+    )
+
+    con = connect(options)
+    return gen_docs(options, con)
+
+
+def connect(options: CombinedOptions):
+    """
+    Connect to Oracle database using parameters from options.
+    Save connection object into self._con.
+
+    options(CombinedOptions) — CombinedOptions object with options from tag
+                               and config.
+    """
+    logger.debug(
+        f"Trying to connect: host={options['host']} port={options['port']}"
+        f" dbname={options['dbname']}, user={options['user']} "
+        f"password={options['password']}."
+    )
+    return cx_Oracle.connect(
+        f"{options['user']}/{options['password']}@"
+        f"{options['host']}:{options['port']}/"
+        f"{options['dbname']}",
+        encoding='UTF-8',
+        nencoding='UTF-8'
+    )
+
+
+def get_template(options: CombinedOptions, key: str, default_name: str):
+    template_path = options.get(key)
+    if template_path:
+        return template_path
+    else:
+        return resource_filename(
+            __name__,
+            f"templates/{default_name}"
+        )
+
+
+def gen_docs(options: CombinedOptions, connection) -> str:
+    data = collect_datasets(connection, options)
+
+    docs = ''
+
+    if options['doc']:
+        docs += to_md(data, get_template(options, 'doc_template', 'doc.j2'))
+    if options['scheme']:
+        docs += '\n\n' + to_diag(data, get_template(options, 'scheme_template', 'scheme.j2'))
+    return docs
+
+
+def collect_datasets(connection,
+                     options: CombinedOptions) -> dict:
+
+    result = {}
+    filters = options.get('filters', {})
+    components = options['components']
+
+    if 'tables' in components:
+        q_tables = TablesQuery(connection, filters)
+        logger.debug(f'Tables query:\n\n {q_tables.sql}')
+        tables = q_tables.run()
+
+        q_columns = ColumnsQuery(connection, filters)
+        logger.debug(f'Columns query:\n\n {q_columns.sql}')
+        columns = q_columns.run()
+
+        q_fks = ForeignKeysQuery(connection, filters)
+        logger.debug(f'Foreign keys query:\n\n {q_fks.sql}')
+        fks = q_fks.run()
+
+        # fill each table with columns and foreign keys
+        result['tables'] = collect_tables(tables, columns, fks)
+
+    # q_functions = FunctionsQuery(connection, filters)
+    # logger.debug(f'Functions keys query:\n\n {q_functions.sql}')
+    # functions = q_functions.run()
+
+    # q_parameters = ParametersQuery(connection, filters)
+    # logger.debug(f'Parameters keys query:\n\n {q_parameters.sql}')
+    # parameters = q_parameters.run()
+
+    # # fill each function with its parameters
+    if 'functions' in components:
+        result['functions'] = FunctionsQuery(connection, filters).run()
+
+    if 'triggers' in components:
+        result['triggers'] = TriggersQuery(connection, filters).run()
+    return result
+
+
+def collect_tables(tables: list,
+                   columns: list,
+                   fks: list) -> list:
+    '''
+    Parse table and column query results got from db and:
+
+    - add 'columns' attribute to each table row with list of table columns;
+    - add 'foreign_keys' attribute to each column with list of fks if it is a
+      forign key column.
+
+    returns transformed list of tables.
+    '''
+
+    result = deepcopy(tables)
+    for table in result:
+        # get columns for this table
+        table_columns = list(filter(lambda x: x['TABLE_NAME'] == table['TABLE_NAME'],
+                                    columns))
+        for col in table_columns:
+            # get foreign keys for this column
+            fks_fltr = list(
+                filter(
+                    lambda x: x['TABLE_NAME'] == table['TABLE_NAME']
+                    and x['COLUMN_NAME'] == col['COLUMN_NAME'], fks
+                )
+            )
+            col['foreign_keys'] = fks_fltr
+        table['columns'] = table_columns
+    return result
+
+
+def collect_functions(functions: list,
+                      parameters: list) -> list:
+    '''
+    Parse function and parameter query results got from db and add 'parameters'
+    key to each function filled with its parameters
+    '''
+
+    result = deepcopy(functions)
+    for func in result:
+        # get parameters for this function
+        function_params = list(
+            filter(
+                lambda x: x['specific_name'] == func['specific_name'], parameters
+            )
+        )
+        func['parameters'] = function_params
+    return result
+
+
+def to_md(data: dict, template: str) -> str:
+    with open(template, encoding='utf8') as f:
+        template = Template(f.read())
+
+    return template.render(
+        tables=data['tables'],
+        functions=data['functions'],
+        triggers=data['triggers']
+    )
+
+
+def to_diag(data: dict, template: str) -> str:
+    with open(template, encoding='utf8') as f:
+        template = Template(f.read())
+
+    return template.render(
+        tables=data['tables']
+    )

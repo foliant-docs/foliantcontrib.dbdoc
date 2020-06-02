@@ -1,0 +1,109 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'schemaname' (string) - table schema name;
+    'relname' (string) - table name;
+    'description' (str) - table comment (description);
+    'columns' (list) - list of dictionaries with info about each column;
+        'table_name' (string) - table name;
+        'ordinal_position' (integer) - position of the column in table definition;
+        'column_name' (string) - column name;
+        'is_nullable' (string) - 'YES' if column is nullable, 'NO' otherwise;
+        'data_type' (string) - column data type;
+        'column_default' (string) - default value of column or '' if there's no.
+        'character_maximum_length' (integer) - max length for varchar if specified
+                                               otherwise '';
+        'numeric_precision' (integer) — maximum number of digits in value.
+                                        For numeric values;
+        'description' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'table_schema' (string) - column table schema;
+            'constraint_name' (string) - name of the constraint for this fk;
+            'table_name' (string) - column table name;
+            'foreign_table_schema' (string) - schema of the referenced table;
+            'foreign_table_name' (string) - name of the referenced table;
+            'foreign_column_name' (string) - name of the referenced column.
+
+functions (list) - list of dictionaries with info about stored functions;
+    'routine_name' (string) - name of the function;
+    'specific_name' (string) - unique name of this specific function;
+    'data_type' (string) - data type of the function returning value;
+    'routine_definition' (string) - function body;
+    'external_language' (string) - the language function is written on.
+    'description' (string) - function comment (description).
+    'parameters' (list) - list of dictionaries with info about parameters of
+                          this function;
+        'specific_name' (string) - unique name of this specific function;
+        'parameter_name' (string) - parameter name;
+        'parameter_mode' (string) - IN, OUT or INOUT;
+        'data_type' (string) - parameter data type;
+        'parameter_default' (string) - default value of the parameter or ''.
+
+triggers (list) - list of dictionaries with info about triggers;
+    'event_object_table' (string) — table on which the trigger is set;
+    'trigger_name' (string) — name of the trigger;
+    'event_manipulation' (string) — which event is triggered (INSERT, UPDATE, etc);
+    'trigger_schema' (string) — schema of the trigger;
+    'action_timing' (string) — timing of the trigger (BEFORE, AFTER);
+    'action_orientation' (string) — action orientation;
+    'action_statement' (string) — source code of the trigger;
+#}
+
+# Tables
+
+{% for table in tables %}
+## {{ table['relname'] }}
+
+{{ table['description'] }}
+
+column | nullable | type | descr | fkey
+------ | -------- | ---- | ----- | ----
+{% for col in table['columns'] -%}
+{{ col['column_name'] }} | {{ col['is_nullable'] }} | {{ col['data_type'] }} | {{ col['description'] }} | 
+{%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['foreign_table_name'] }}[{{ col['foreign_keys'][0]['foreign_column_name'] }}]
+{%- endif %}{# {%- if col['foreign_keys']  %} #}
+{% endfor %}{# {% for col in table['columns'] -%} #}
+{% endfor %}{# {% for table in tables %} #}
+
+{% if functions -%}
+# Functions
+
+{% for func in functions %}
+## {{ func['routine_name'] }}
+
+{{ func['description'] }}
+
+**Language**: {{ func['external_language'] }}
+
+**Data Type**: {{ func['data_type'] }}
+
+{% if func['parameters'] -%}
+**Parameters**:
+
+name | type | mode | default
+---- | ---- | ---- | -------
+{% for param in func['parameters'] -%}
+{{ param['parameter_name'] }} | {{ param['data_type'] }} | {{ param['parameter_mode'] }} | {{ param['parameter_default'] }}
+{% endfor %}{# {% for param in func['parameters'] %} #}
+{% endif %}{# {% if func['parameters'] %} #}
+{{func['routine_definition']|indent}}
+{% endfor %}{# {% for func in functions %} #}
+{% endif %}{# {% if functions %} #}
+
+{% if triggers -%}
+# Triggers
+
+{% for trig in triggers %}
+## {{ trig['event_object_table'] }} {{ trig['action_timing'] }} {{ trig['event_manipulation'] }}
+
+**Name**: {{ trig['trigger_name']|indent }}
+
+**Table**: {{ trig['event_object_table'] }}
+
+**Event**: {{ trig['action_timing'] }} {{ trig['event_manipulation'] }}
+
+{{ trig['action_statement']|indent }}
+
+{% endfor %}{# {% for trig in triggers %} #}
+{% endif %}{# {% if triggers %} #}
