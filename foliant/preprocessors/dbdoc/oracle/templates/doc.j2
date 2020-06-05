@@ -24,6 +24,12 @@ tables (list) - list of dictionaries with info about tables;
             'F_OWNER' (string) - schema of the referenced table;
             'F_TABLE_NAME' (string) - name of the referenced table.
 
+views (list) - list of dictionaries with info about views;
+    'OWNER' (string) - schema where the view is declared;
+    'VIEW_NAME' (string) — name of the view;
+    'TEXT' (string) — source code of the view (LONG);
+    'TEXT_VC' (string) — source code of the view (VARCHAR2);
+
 functions (list) - list of dictionaries with info about stored functions;
     'NAME' (string) - name of the function;
     'TYPE' (string) - 'FUNCTION' or 'PROCEDURE';
@@ -38,6 +44,9 @@ triggers (list) - list of dictionaries with info about triggers;
     'TRIGGERING_EVENT' (string) — which event is triggered ('INSERT',
                                   'UPDATE OR DELETE', etc);
     'TABLE_NAME' (string) — table for which the trigger is defined;
+    'DESCRIPTION' (string) — description part of the trigger source;
+    'TRIGGER_BODY' (string) — body part of the trigger source;
+    'SOURCE' (string) — source of the trigger;
 #}
 
 # Tables
@@ -55,6 +64,27 @@ column | nullable | type | descr | fkey
 {%- endif %}{# {%- if col['foreign_keys']  %} #}
 {% endfor %}{# {% for col in table['columns'] -%} #}
 {% endfor %}{# {% for table in tables %} #}
+
+{% if views -%}
+# Views
+
+{% for view in views %}
+## {{ view['VIEW_NAME'] }}
+
+```sql
+{% if view['TEXT'] %}
+{{ view['TEXT'] }}
+{% else %}
+{{ view['TEXT_VC'] }}
+{% endif %}
+```
+
+**Name**: {{ view['VIEW_NAME']|indent }}
+
+**Schema**: {{ view['OWNER'] }}
+
+{% endfor %}{# {% for view in views %} #}
+{% endif %}{# {% if views %} #}
 
 {% if functions -%}
 # Functions
@@ -81,6 +111,15 @@ column | nullable | type | descr | fkey
 
 {% for trig in triggers %}
 ## {{ trig['TABLE_NAME'] }} on {{ trig['TRIGGERING_EVENT'] }}
+
+```sql
+{% if trig['SOURCE'] %}
+{{ trig['SOURCE'] }}
+{% else %}
+TRIGGER {{ trig['DESCRIPTION'] }}
+{{ trig['TRIGGER_BODY'] }}
+{% endif %}
+```
 
 **Name**: {{ trig['TRIGGER_NAME']|indent }}
 

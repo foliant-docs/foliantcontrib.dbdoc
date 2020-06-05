@@ -25,6 +25,12 @@ tables (list) - list of dictionaries with info about tables;
             'foreign_table_name' (string) - name of the referenced table;
             'foreign_column_name' (string) - name of the referenced column.
 
+views (list) - list of dictionaries with info about views;
+    'table_' (string) — table on which the trigger is set;
+    'table_schema' (string) — schema of the view;
+    'table_name' (string) — name of the view;
+    'view_definition' (string) — source code of the view;
+
 functions (list) - list of dictionaries with info about stored functions;
     'routine_name' (string) - name of the function;
     'specific_name' (string) - unique name of this specific function;
@@ -66,11 +72,36 @@ column | nullable | type | descr | fkey
 {% endfor %}{# {% for col in table['columns'] -%} #}
 {% endfor %}{# {% for table in tables %} #}
 
+{% if views -%}
+# Views
+
+{% for view in views %}
+## {{ view['table_name'] }}
+
+{% if view['view_definition'] %}
+```sql
+{{ view['view_definition'] }}
+{% endif %}
+```
+
+**Name**: {{ view['table_name']|indent }}
+
+**Schema**: {{ view['table_schema'] }}
+
+{% endfor %}{# {% for view in views %} #}
+{% endif %}{# {% if views %} #}
+
 {% if functions -%}
 # Functions
 
 {% for func in functions %}
 ## {{ func['routine_name'] }}
+{% if func['routine_definition'] %}
+
+```sql
+{{func['routine_definition']}}
+```
+{% endif %}
 
 {{ func['description'] }}
 
@@ -87,7 +118,6 @@ name | type | mode | default
 {{ param['parameter_name'] }} | {{ param['data_type'] }} | {{ param['parameter_mode'] }} | {{ param['parameter_default'] }}
 {% endfor %}{# {% for param in func['parameters'] %} #}
 {% endif %}{# {% if func['parameters'] %} #}
-{{func['routine_definition']|indent}}
 {% endfor %}{# {% for func in functions %} #}
 {% endif %}{# {% if functions %} #}
 
@@ -97,13 +127,17 @@ name | type | mode | default
 {% for trig in triggers %}
 ## {{ trig['event_object_table'] }} {{ trig['action_timing'] }} {{ trig['event_manipulation'] }}
 
+{% if trig['action_statement'] %}
+```sql
+{{ trig['action_statement'] }}
+```
+{% endif %}
+
 **Name**: {{ trig['trigger_name']|indent }}
 
 **Table**: {{ trig['event_object_table'] }}
 
 **Event**: {{ trig['action_timing'] }} {{ trig['event_manipulation'] }}
-
-{{ trig['action_statement']|indent }}
 
 {% endfor %}{# {% for trig in triggers %} #}
 {% endif %}{# {% if triggers %} #}

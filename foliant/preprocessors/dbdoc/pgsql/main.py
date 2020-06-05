@@ -5,7 +5,7 @@ from jinja2 import Template
 from pkg_resources import resource_filename
 from foliant.preprocessors.utils.combined_options import CombinedOptions
 from logging import getLogger
-from .queries import (TablesQuery, ColumnsQuery, ForeignKeysQuery,
+from .queries import (TablesQuery, ColumnsQuery, ForeignKeysQuery, ViewsQuery,
                       FunctionsQuery, ParametersQuery, TriggersQuery)
 
 logger = getLogger('flt.dbdoc.pgsql')
@@ -22,6 +22,7 @@ def process(config, tag_options) -> str:
         'password': 'postgres',
         'components': [
             'tables',
+            'views',
             'functions',
             'triggers'
         ]
@@ -107,6 +108,11 @@ def collect_datasets(connection,
         # fill each table with columns and foreign keys
         result['tables'] = collect_tables(tables, columns, fks)
 
+    if 'views' in components:
+        q_views = ViewsQuery(connection, filters)
+        logger.debug(f'Views query:\n\n {q_views.sql}')
+        result['views'] = q_views.run()
+
     if 'functions' in components:
         q_functions = FunctionsQuery(connection, filters)
         logger.debug(f'Functions keys query:\n\n {q_functions.sql}')
@@ -121,7 +127,9 @@ def collect_datasets(connection,
         result['functions'] = collect_functions(functions, parameters)
 
     if 'triggers' in components:
-        result['triggers'] = TriggersQuery(connection, filters).run()
+        q_triggers = TriggersQuery(connection, filters)
+        logger.debug(f'Triggers query:\n\n {q_triggers.sql}')
+        result['triggers'] = q_triggers.run()
     return result
 
 
@@ -179,11 +187,7 @@ def to_md(data: dict, template: str) -> str:
     with open(template, encoding='utf8') as f:
         template = Template(f.read())
 
-    return template.render(
-        tables=data['tables'],
-        functions=data['functions'],
-        triggers=data['triggers']
-    )
+    return template.render(**data)
 
 
 def to_diag(data: dict, template: str) -> str:

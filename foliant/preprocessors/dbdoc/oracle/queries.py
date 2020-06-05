@@ -171,10 +171,10 @@ class FunctionsQuery(QueryBase):
         TYPE,
         OWNER,
         RTRIM(XMLAGG(XMLELEMENT(E,TEXT).EXTRACT('//text()') ORDER BY LINE).GetClobVal(),',') AS SOURCE
-    FROM all_source
+    FROM ALL_SOURCE
     WHERE TYPE in ('FUNCTION', 'PROCEDURE')
-    AND owner = 'MASTER'
-    GROUP BY name, TYPE, owner"""
+    GROUP BY NAME, TYPE, OWNER
+    ORDER BY NAME"""
 
     _filter_fields = {SCHEMA: 'OWNER'}
 
@@ -182,18 +182,40 @@ class FunctionsQuery(QueryBase):
 class TriggersQuery(QueryBase):
 
     base_query = """SELECT
+        tr.OWNER,
+        tr.TRIGGER_NAME,
+        tr.TRIGGER_TYPE,
+        tr.TRIGGERING_EVENT,
+        tr.TABLE_OWNER,
+        tr.TABLE_NAME,
+        tr.DESCRIPTION,
+        tr.TRIGGER_BODY,
+        (SELECT
+            RTRIM(XMLAGG(XMLELEMENT(E,TEXT).EXTRACT('//text()') ORDER BY LINE).GetClobVal(),',') AS SOURCE
+        FROM all_source
+        WHERE TYPE = 'TRIGGER'
+          AND owner = tr.owner
+          AND name = tr.TRIGGER_NAME
+        GROUP BY name, TYPE, owner) AS SOURCE
+            FROM ALL_TRIGGERS tr
+            WHERE 1=1
+            {filters}
+            ORDER BY TABLE_NAME, trigger_name"""
+
+    _filter_fields = {SCHEMA: 'tr.OWNER'}
+
+
+class ViewsQuery(QueryBase):
+
+    base_query = """SELECT
         OWNER,
-        TRIGGER_NAME,
-        TRIGGER_TYPE,
-        TRIGGERING_EVENT,
-        TABLE_OWNER,
-        TABLE_NAME,
-        DESCRIPTION,
-        TRIGGER_BODY
-    FROM all_triggers
+        VIEW_NAME,
+        TEXT,
+        TEXT_VC
+    FROM ALL_VIEWS
     WHERE 1=1
     {filters}
-    ORDER BY TABLE_NAME, trigger_name"""
+    ORDER BY VIEW_NAME"""
 
     _filter_fields = {SCHEMA: 'OWNER'}
 

@@ -219,3 +219,17 @@ class TriggersQuery(QueryBase):
     ORDER BY event_object_table, trigger_name"""
 
     _filter_fields = {SCHEMA: 'trigger_schema'}
+
+
+class ViewsQuery(QueryBase):
+
+    base_query = """SELECT
+        table_schema,
+        table_name,
+        view_definition
+    FROM INFORMATION_SCHEMA.views
+    WHERE 1=1
+    {filters}
+    ORDER BY table_name"""
+
+    _filter_fields = {SCHEMA: 'table_schema'}
