@@ -89,7 +89,7 @@ preprocessors:
 :   Path to jinja-template for scheme. Path is relative to the project directory. If not supplied — default template would be used.
 
 `components`
-:   List of components to be added to documentation. If not supplied — everything will be added. Use to exclude some parts of documentation.
+:   List of components to be added to documentation. If not supplied — everything will be added. Use to exclude some parts of documentation. Available components: `'tables'`, `'views'`, `'functions'`, `'triggers'`.
 
 ## Usage
 

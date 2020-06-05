@@ -218,5 +218,3 @@ class ViewsQuery(QueryBase):
     ORDER BY VIEW_NAME"""
 
     _filter_fields = {SCHEMA: 'OWNER'}
-
-# views?
