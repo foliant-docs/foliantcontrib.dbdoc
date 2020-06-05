@@ -173,6 +173,7 @@ class FunctionsQuery(QueryBase):
         RTRIM(XMLAGG(XMLELEMENT(E,TEXT).EXTRACT('//text()') ORDER BY LINE).GetClobVal(),',') AS SOURCE
     FROM ALL_SOURCE
     WHERE TYPE in ('FUNCTION', 'PROCEDURE')
+    {filters}
     GROUP BY NAME, TYPE, OWNER
     ORDER BY NAME"""
 

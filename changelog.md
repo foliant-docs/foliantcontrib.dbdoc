@@ -1,3 +1,7 @@
+# 0.1.2
+
+-    Fix: schema filter in Oracle functions query
+
 # 0.1.1
 
 -    New: Add views query to components

@@ -2,6 +2,10 @@
 
 # Database Documentation Generator for Foliant
 
+![](img/dbdoc.png)
+
+*Static site on the picture was built with [Slate](https://foliant-docs.github.io/docs/backends/slate/) backend together with DBDoc preprocessor*
+
 This preprocessor generates simple documentation based on the structure of the database. It uses [Jinja2](http://jinja.pocoo.org/) templating engine for customizing the layout and [PlantUML](http://plantuml.com/) for drawing the database scheme.
 
 Currently supported databases:
