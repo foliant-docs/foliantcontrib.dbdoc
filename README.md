@@ -2,7 +2,7 @@
 
 # Database Documentation Generator for Foliant
 
-![](img/dbdoc.png)
+![](https://raw.githubusercontent.com/foliant-docs/foliantcontrib.dbdoc/master/img/dbdoc.png)
 
 *Static site on the picture was built with [Slate](https://foliant-docs.github.io/docs/backends/slate/) backend together with DBDoc preprocessor*
 
