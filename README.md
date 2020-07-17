@@ -218,5 +218,4 @@ If you wish to create your own template, the default ones may be a good starting
 * [Default **Oracle doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/doc.j2)
 * [Default **Oracle scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/scheme.j2)
 * [Default **PostgreSQL doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
-* [Default **PostgreSQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql
-* /templates/doc.j2)
+* [Default **PostgreSQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
