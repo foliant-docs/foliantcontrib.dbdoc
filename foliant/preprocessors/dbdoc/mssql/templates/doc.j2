@@ -1,0 +1,116 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'TABLE_SCHEMA' (string) - table schema name;
+    'TABLE_NAME' (string) - table name;
+    'columns' (list) - list of dictionaries with info about each column;
+        'TABLE_NAME' (string) - table name;
+        'COLUMN_ID' (integer) - position of the column in table definition;
+        'COLUMN_NAME' (string) - column name;
+        'IS_NULLABLE' (string) - 'Y' if column is nullable, 'N' otherwise;
+        'DATA_TYPE' (string) - column data type;
+        'COLUMN_DEFAULT' (string) - default value of column or '' if there's no.
+        'CHARACTER_MAXIMUM_LENGTH' (integer) - max length;
+        'NUMERIC_PRECISION' (integer) — maximum number of digits in value.
+                                     For numeric values;
+        'COMMENT' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'SCHEMA_NAME' (string) - constraint table schema;
+            'COLUMN_NAME' (string) - name of the fk column;
+            'TABLE_NAME' (string) - column table name;
+            'REF_SCHEMA_NAME' (string) - schema of the referenced table;
+            'REF_TABLE_NAME' (string) - name of the referenced table.
+            'REF_COLUMN_NAME' (string) - name of the referenced column.
+
+views (list) - list of dictionaries with info about views;
+    'SCHEMA_NAME' (string) - schema where the view is declared;
+    'VIEW_NAME' (string) — name of the view;
+    'DEFINITION' (string) — source code of the view.
+
+functions (list) - list of dictionaries with info about stored functions;
+    'NAME' (string) - name of the function;
+    'SCHEMA_NAME' (string) - schema where the function is declared;
+    'DEFINITION' (string) - function source;
+
+triggers (list) - list of dictionaries with info about triggers;
+    'TABLE_SCHEMA' (string) - schema where the table is declared;
+    'TRIGGER_NAME' (string) — name of the trigger;
+    'TRIGGER_TYPE' (string) — for example 'AFTER INSERT UPDATE', 'INSTEAD OF DELETE' etc.
+    'TABLE_NAME' (string) — table for which the trigger is defined;
+    'DEFINITION' (string) — source of the trigger;
+    'DISABLED' (string) — is trigger disabled or not.
+#}
+
+# Tables
+
+{% for table in tables %}
+## {{ table['TABLE_NAME'] }}
+
+column | nullable | type | descr | fkey
+------ | -------- | ---- | ----- | ----
+{% for col in table['columns'] -%}
+{{ col['COLUMN_NAME'] }} | {{ col['IS_NULLABLE'] }} | {{ col['DATA_TYPE'] }} | {{ col['COMMENT'] }} | 
+{%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['REF_TABLE_NAME'] }}.{{ col['foreign_keys'][0]['REF_COLUMN_NAME'] }}
+{%- endif %}{# {%- if col['foreign_keys']  %} #}
+{% endfor %}{# {% for col in table['columns'] -%} #}
+{% endfor %}{# {% for table in tables %} #}
+
+{% if views -%}
+# Views
+
+{% for view in views %}
+## {{ view['VIEW_NAME'] }}
+
+```sql
+{{ view['DEFINITION'] }}
+```
+
+**Name**: {{ view['VIEW_NAME']|indent }}
+
+**Schema**: {{ view['SCHEMA_NAME'] }}
+
+{% endfor %}{# {% for view in views %} #}
+{% endif %}{# {% if views %} #}
+
+{% if functions -%}
+# Functions
+
+{% for func in functions %}
+## {{ func['NAME'] }}
+
+**Schema**: {{ func['SCHEMA_NAME'] }}
+
+
+{% if func['DEFINITION'] %}
+```sql
+{{ func['DEFINITION'] }}
+```
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% if triggers -%}
+# Triggers
+
+{% for trig in triggers %}
+## {{ trig['TABLE_NAME'] }} {{ trig['TRIGGER_TYPE'] }}
+
+```sql
+{{ trig['DEFINITION'] }}
+```
+
+**Name**: {{ trig['TRIGGER_NAME']|indent }}
+
+**Schema**: {{ trig['TABLE_SCHEMA'] }}
+
+**Table**: {{ trig['TABLE_NAME'] }}
+
+**Type**: {{ trig['TRIGGER_TYPE'] }}
+
+**Disabled**: {{ trig['DISABLED'] }}
+
+{% endfor %}{# {% for trig in triggers %} #}
+{% endif %}{# {% if triggers %} #}

@@ -1,3 +1,7 @@
+# 0.1.3
+
+-    New: Added support for Microsoft SQL Server
+
 # 0.1.2
 
 -    Fix: schema filter in Oracle functions query

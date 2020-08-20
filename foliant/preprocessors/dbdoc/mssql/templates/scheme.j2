@@ -1,0 +1,45 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'TABLE_SCHEMA' (string) - table schema name;
+    'TABLE_NAME' (string) - table name;
+    'columns' (list) - list of dictionaries with info about each column;
+        'TABLE_NAME' (string) - table name;
+        'COLUMN_ID' (integer) - position of the column in table definition;
+        'COLUMN_NAME' (string) - column name;
+        'IS_NULLABLE' (string) - 'Y' if column is nullable, 'N' otherwise;
+        'DATA_TYPE' (string) - column data type;
+        'COLUMN_DEFAULT' (string) - default value of column or '' if there's no.
+        'CHARACTER_MAXIMUM_LENGTH' (integer) - max length;
+        'NUMERIC_PRECISION' (integer) — maximum number of digits in value.
+                                     For numeric values;
+        'COMMENT' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'SCHEMA_NAME' (string) - constraint table schema;
+            'COLUMN_NAME' (string) - name of the fk column;
+            'TABLE_NAME' (string) - column table name;
+            'REF_SCHEMA_NAME' (string) - schema of the referenced table;
+            'REF_TABLE_NAME' (string) - name of the referenced table.
+            'REF_COLUMN_NAME' (string) - name of the referenced column.
+#}
+# Database Scheme
+
+<plantuml>
+    @startuml
+{% for table in tables %}
+    object {{ table['TABLE_NAME'] }} {
+{% for column in table['columns'] -%}
+{{ column['COLUMN_NAME']|indent(8) }} [{{ column['DATA_TYPE'] }}]
+{% endfor %}{# {% for column in table['columns'] %} #}
+}{% endfor %}{# {% for table in tables %} #}
+
+{% for table in tables -%}
+{% for column in table['columns'] -%}
+{% for fk in column['foreign_keys'] %}
+{{ fk['TABLE_NAME']|indent }} --> {{ fk['REF_TABLE_NAME'] }} : {{ fk['REF_COLUMN_NAME'] }}
+{%- endfor -%}{# {% for fk in colulmn['foreign_keys'] %} #}
+{%- endfor -%}{# {% for column in table['columns'] %} #}
+{%- endfor -%}{# {% for table in tables %} #}
+    @enduml
+</plantuml>

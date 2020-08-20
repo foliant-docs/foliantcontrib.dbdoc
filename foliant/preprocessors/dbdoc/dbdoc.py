@@ -8,10 +8,11 @@ from foliant.preprocessors.utils.preprocessor_ext import (BasePreprocessorExt,
 
 from .pgsql.main import process as process_pgsql
 from .oracle.main import process as process_oracle
+from .mssql.main import process as process_mssql
 
 
 class Preprocessor(BasePreprocessorExt):
-    tags = ('pgsqldoc', 'dbdoc', 'pgsql', 'oracle')
+    tags = ('pgsqldoc', 'dbdoc', 'pgsql', 'oracle', 'sqlserver')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -25,7 +26,8 @@ class Preprocessor(BasePreprocessorExt):
         dbms_func = {
             'pgsql': process_pgsql,
             'pgsqldoc': process_pgsql,
-            'oracle': process_oracle
+            'oracle': process_oracle,
+            'sqlserver': process_mssql
         }
         dbms = match.group('tag')
         tag_options = self.get_options(match.group('options'))

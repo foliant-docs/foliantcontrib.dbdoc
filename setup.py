@@ -16,14 +16,15 @@ setup(
     description=SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    version='0.1.2',
+    version='0.1.3',
     author='Daniil Minukhin',
     author_email='ddddsa@gmail.com',
     # package_dir={'': 'foliant/preprocessors/'},
     packages=find_namespace_packages(exclude=['*.test', 'foliant', '*.templates']),
     package_data={
         'foliant.preprocessors.dbdoc.pgsql': ['templates/*.j2'],
-        'foliant.preprocessors.dbdoc.oracle': ['templates/*.j2']
+        'foliant.preprocessors.dbdoc.oracle': ['templates/*.j2'],
+        'foliant.preprocessors.dbdoc.mssql': ['templates/*.j2']
     },
     license='MIT',
     platforms='any',
@@ -34,6 +35,7 @@ setup(
         'foliantcontrib.plantuml',
         'psycopg2-binary',
         'cx_Oracle',
+        'pyodbc',
         'jinja2',
         'PyYAML'
     ],

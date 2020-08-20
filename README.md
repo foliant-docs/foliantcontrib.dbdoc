@@ -11,7 +11,8 @@ This preprocessor generates simple documentation based on the structure of the d
 Currently supported databases:
 
 * **PostgreSQL**,
-* **Oracle**.
+* **Oracle**,
+* **Microsoft SQL Server**.
 
 ## Installation
 
@@ -19,11 +20,21 @@ Currently supported databases:
 
 DBDoc generates documentation by querying database structure. That's why you will need client libraries installed on your computer before running the preprocessor.
 
+**PosgreSQL**
+
 PostgreSQL will be installed automatically with the preprocessor.
 
-But Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags). So, if you are planning on using DBDoc to document Oracle databases, first install the [Instant Client](https://www.oracle.com/database/technologies/instant-client.html).
+**Oracle**
+
+Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags). So, if you are planning on using DBDoc to document Oracle databases, first install the [Instant Client](https://www.oracle.com/database/technologies/instant-client.html).
 
 > If you search the web, you can find ways to install Oracle Instant Client inside your Docker image, just saying.
+
+**Microsoft SQL Server**
+
+On Windows you will need to install MS SQL Server.
+
+On Unix you will first need to install [unixODBC](http://www.unixodbc.org/), and then — the ODBC driver. Microsoft has a detailed instructions on how to install the driver [on Linux](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server) and [on Mac](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos).
 
 ### Preprocessor
 
@@ -45,6 +56,7 @@ The preprocessor has a number of options:
 ```yaml
 preprocessors:
     - dbdoc:
+        dbms: pgsql
         host: localhost
         port: 5432
         dbname: postgres
@@ -60,7 +72,11 @@ preprocessors:
           - tables
           - functions
           - triggers
+        driver: '{ODBC Driver 17 for SQL Server}'
 ```
+
+`dbms`
+:   Name of the DBMS. Should be one of: `pgsql`, `oracle`, `sqlserver`. Only needed if you are using `<dbdoc>` tag. If you are using explicit tags (`<oracle>`, `<pgsql>`), this parameter is ignored.
 
 `host`
 :   Database host address. Default: `localhost`
@@ -95,9 +111,12 @@ preprocessors:
 `components`
 :   List of components to be added to documentation. If not supplied — everything will be added. Use to exclude some parts of documentation. Available components: `'tables'`, `'views'`, `'functions'`, `'triggers'`.
 
+`driver`
+:   Specific option for MS SQL Server database. Defines the driver connection string. Default: `{ODBC Driver 17 for SQL Server}`.
+
 ## Usage
 
-DBDoc currently supports two database engines: Oracle and PostgreSQL. To generate Oracle database documentation, add an `<oracle></oracle>` tag to a desired place of your chapter.
+DBDoc currently supports three database engines: Oracle, PostgreSQL and Microsoft SQL Server. To generate Oracle database documentation, add an `<oracle></oracle>` tag to a desired place of your chapter.
 
 
 ```html
@@ -117,6 +136,17 @@ To generate PostgreSQL database documentation, add a `<pgsql></pgsql>` tag to a 
 This document contains the most awesome automatically generated documentation of our marvellous Oracle database.
 
 <pgsql></pgsql>
+```
+
+To generate SQL Server database documentation, add a `<sqlserver></sqlserver>` tag to a desired place of your chapter.
+
+
+```html
+# Introduction
+
+This document contains the most awesome automatically generated documentation of our marvellous SQL Server database.
+
+<sqlserver></sqlserver>
 ```
 
 Each time the preprocessor encounters one of the mentioned tags, it inserts the whole generated documentation text instead of it. The connection parameters are taken from the config-file.
@@ -182,6 +212,8 @@ operator | SQL equivalent | description | value
 `regex` | `~`, `REGEX_LIKE` | matches regular expression | literal
 `not_regex` | `!~`, `NOT REGEX_LIKE` | does not match regular expression | literal
 
+> Note: `regex` and `not_regex` are not supported with Microsoft SQL Server DBMS.
+
 List of currently supported filtering fields:
 
 field | description
@@ -219,3 +251,60 @@ If you wish to create your own template, the default ones may be a good starting
 * [Default **Oracle scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/scheme.j2)
 * [Default **PostgreSQL doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
 * [Default **PostgreSQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
+* [Default **SQL Server doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
+* [Default **SQL Server scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
+
+## Troubleshooting
+
+If you get errors during build, especially errors concerning connection to the database, you have to make sure that you are supplying the right parameters.
+
+There may be a lot of possible causes for errors. For example, MS SQL Server will fail to connect to local database if you specify host as `localhost`, you have to explicitly write `0.0.0.0` or `127.0.0.1`.
+
+So your first action to root the source of your errors should be running a python console a trying to connect to your database manually.
+
+Here are sample snippets on how to connect to different databases.
+
+**PostgreSQL**
+
+[psycopg2](https://pypi.org/project/psycopg2/) library is required.
+
+```python
+import psycopg2
+
+con = psycopg2.connect(
+      "host=localhost "
+      "port=5432 "
+      "dbname=MyDatabase "
+      "user=postgres"
+      "password=postgres"
+)
+```
+
+**Oracle**
+
+[cx_Oracle](https://oracle.github.io/python-cx_Oracle/) library is required.
+
+```python
+import cx_Oracle
+
+con = cx_Oracle.connect(
+    "Scott/Tiger@localhost:1521/MyDatabase"
+    encoding='UTF-8',
+    nencoding='UTF-8'
+)
+```
+
+**Microsoft SQL Server**
+
+[pyodbc](https://pypi.org/project/pyodbc/) library is required.
+
+```python
+import pyodbc
+
+con = pyodbc.connect(
+    "DRIVER={ODBC Driver 17 for SQL Server};"
+    "SERVER=0.0.0.0,1433;"
+    "DATABASE=MyDatabase;"
+    "UID=Usernam;PWD=Password_0"
+)
+```
