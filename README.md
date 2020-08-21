@@ -15,6 +15,8 @@ Currently supported databases:
 * **Microsoft SQL Server**,
 * **MySQL**.
 
+> **Important Notice**: We, here at Foliant, don't work with *all* of the databases mentioned above. That's why we cannot properly test the preprocessor's work with all of them. That's where we need your help: If you encounter ANY errors during build; if you are not getting enough information for your document in the template; if you can't make the filters work; or if you see any other anomaly, please [send us an issue](https://github.com/foliant-docs/foliantcontrib.dbdoc/issues) in GitHub. We will try to fix it as fast as we can. Thanks!
+
 ## Installation
 
 ### Prerequisites
