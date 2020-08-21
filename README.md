@@ -287,9 +287,9 @@ If you wish to create your own template, the default ones may be a good starting
 
 If you get errors during build, especially errors concerning connection to the database, you have to make sure that you are supplying the right parameters.
 
-There may be a lot of possible causes for errors. For example, MS SQL Server will fail to connect to local database if you specify host as `localhost`, you have to explicitly write `0.0.0.0` or `127.0.0.1`.
+There may be a lot of possible causes for errors. For example, MS SQL Server may fail to connect to local database if you specify host as `localhost`, you have to explicitly write `0.0.0.0` or `127.0.0.1`.
 
-So your first action to root the source of your errors should be running a python console a trying to connect to your database manually.
+So your first action to root the source of your errors should be running a python console and trying to connect to your database manually.
 
 Here are sample snippets on how to connect to different databases.
 
