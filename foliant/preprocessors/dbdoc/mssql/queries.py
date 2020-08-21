@@ -1,4 +1,3 @@
-import psycopg2
 from abc import ABCMeta
 
 SCHEMA = 'schema'
@@ -13,7 +12,7 @@ class QueryBase(metaclass=ABCMeta):
     # sort_fields = {}
 
     def __init__(self,
-                 con: psycopg2.extensions.connection,
+                 con,
                  filters: dict = {}):
         self._con = con
         self._filters = self._resolve_filters(filters)

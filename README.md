@@ -12,7 +12,8 @@ Currently supported databases:
 
 * **PostgreSQL**,
 * **Oracle**,
-* **Microsoft SQL Server**.
+* **Microsoft SQL Server**,
+* **MySQL**.
 
 ## Installation
 
@@ -35,6 +36,21 @@ Oracle libraries are proprietary, so we cannot include them even in our [Docker 
 On Windows you will need to install MS SQL Server.
 
 On Unix you will first need to install [unixODBC](http://www.unixodbc.org/), and then — the ODBC driver. Microsoft has a detailed instructions on how to install the driver [on Linux](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server) and [on Mac](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos).
+
+**MySQL**
+
+On Mac you can simply run
+
+```bash
+$ brew install mysql
+```
+
+On Linux you will have to install server and client packages, for example, with apt-get:
+
+```bash
+sudp apt-get update
+sudo apt-get install -y mysql-server libmysqlclient-dev
+```
 
 ### Preprocessor
 
@@ -76,7 +92,7 @@ preprocessors:
 ```
 
 `dbms`
-:   Name of the DBMS. Should be one of: `pgsql`, `oracle`, `sqlserver`. Only needed if you are using `<dbdoc>` tag. If you are using explicit tags (`<oracle>`, `<pgsql>`), this parameter is ignored.
+:   Name of the DBMS. Should be one of: `pgsql`, `oracle`, `sqlserver`, `mysql`. Only needed if you are using `<dbdoc>` tag. If you are using explicit tags (`<oracle>`, `<pgsql>`), this parameter is ignored.
 
 `host`
 :   Database host address. Default: `localhost`
@@ -136,6 +152,17 @@ To generate PostgreSQL database documentation, add a `<pgsql></pgsql>` tag to a 
 This document contains the most awesome automatically generated documentation of our marvellous Oracle database.
 
 <pgsql></pgsql>
+```
+
+To generate MySQL database documentation, add a `<mysql></mysql>` tag to a desired place of your chapter.
+
+
+```html
+# Introduction
+
+This document contains the most awesome automatically generated documentation of our marvellous SQL Server database.
+
+<mysql></mysql>
 ```
 
 To generate SQL Server database documentation, add a `<sqlserver></sqlserver>` tag to a desired place of your chapter.
@@ -251,6 +278,8 @@ If you wish to create your own template, the default ones may be a good starting
 * [Default **Oracle scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/oracle/templates/scheme.j2)
 * [Default **PostgreSQL doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
 * [Default **PostgreSQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/pgsql/templates/doc.j2)
+* [Default **MySQL doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mysql/templates/doc.j2)
+* [Default **MySQL scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mysql/templates/doc.j2)
 * [Default **SQL Server doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 * [Default **SQL Server scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 
@@ -292,6 +321,22 @@ con = cx_Oracle.connect(
     encoding='UTF-8',
     nencoding='UTF-8'
 )
+```
+
+**MySQL**
+
+[mysqlclient](https://pypi.org/project/mysqlclient/) library is required.
+
+```python
+from MySQLdb import _mysql
+
+con = _mysql.connect(
+        host='localhost',
+        port=3306,
+        user='root',
+        passwd='password',
+        db='MyDatabase'
+    )
 ```
 
 **Microsoft SQL Server**

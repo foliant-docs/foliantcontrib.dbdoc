@@ -1,0 +1,128 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'TABLE_SCHEMA' (string) - table schema name;
+    'TABLE_NAME' (string) - table name;
+    'TABLE_COMMENT' (str) - table comment (description);
+    'columns' (list) - list of dictionaries with info about each column;
+        'TABLE_NAME' (string) - table name;
+        'COLUMN_NAME' (string) - column name;
+        'ORDINAL_POSITION' (integer) - position of the column in table definition;
+        'IS_NULLABLE' (string) - 'Y' if column is nullable, 'N' otherwise;
+        'DATA_TYPE' (string) - column data type;
+        'COLUMN_DEFAULT' (string) - default value of column or '' if there's no.
+        'CHARACTER_MAXIMUM_LENGTH' (integer) - max length;
+        'NUMERIC_PRECISION' (integer) — maximum number of digits in value.
+                                        For numeric values;
+        'COLUMN_COMMENT' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'CONSTRAINT_SCHEMA' (string) - constraint schema;
+            'COLUMN_NAME' (string) - name of the fk column;
+            'CONSTRAINT_NAME' (string) - name of the constraint for this fk;
+            'TABLE_NAME' (string) - column table name;
+            'REFERENCED_TABLE_SCHEMA' (string) - schema of the referenced table;
+            'REFERENCED_TABLE_NAME' (string) - name of the referenced table;
+            'REFERENCED_COLUMN_NAME' (string) - name of the referenced table column.
+
+views (list) - list of dictionaries with info about views;
+    'TABLE_SCHEMA' (string) - schema where the view is declared;
+    'TABLE_NAME' (string) — name of the view;
+    'VIEW_DEFINITION' (string) — source code of the view (LONG);
+    'IS_UPDATABLE' (string) — is view updatable or not (you can UPDATE and INSERT into updatable views).
+
+functions (list) - list of dictionaries with info about stored functions;
+    'ROUTINE_NAME' (string) - name of the function;
+    'ROUTINE_TYPE' (string) - 'FUNCTION' or 'PROCEDURE';
+    'ROUTINE_SCHEMA' (string) - schema where the function is declared;
+    'ROUTINE_DEFINITION' (string) - function source;
+
+triggers (list) - list of dictionaries with info about triggers;
+    'TRIGGER_SCHEMA' (string) - schema where the trigger is declared;
+    'TRIGGER_NAME' (string) — name of the trigger;
+    'ACTION_TIMING' (string) — for example 'AFTER' or 'BEFORE'.
+    'EVENT_MANIPULATION' (string) — which event is triggered ('INSERT',
+                                  'UPDATE', etc);
+    'EVENT_OBJECT_SCHEMA' (string) — schema of the table for which the trigger
+                                   is defined;
+    'EVENT_OBJECT_TABLE' (string) — table for which the trigger is defined;
+    'ACTION_STATEMENT' (string) — source of the trigger.
+#}
+
+# Tables
+
+{% for table in tables %}
+## {{ table['TABLE_NAME'] }}
+
+{{ table['COMMENT'] }}
+
+column | nullable | type | descr | fkey
+------ | -------- | ---- | ----- | ----
+{% for col in table['columns'] -%}
+{{ col['COLUMN_NAME'] }} | {{ col['IS_NULLABLE'] }} | {{ col['DATA_TYPE'] }} | {{ col['COMMENT'] }} | 
+{%- if col['foreign_keys'] %} {{ col['foreign_keys'][0]['REFERENCED_TABLE_NAME'] }}.{{ col['foreign_keys'][0]['REFERENCED_COLUMN_NAME'] }}
+{%- endif %}{# {%- if col['foreign_keys']  %} #}
+{% endfor %}{# {% for col in table['columns'] -%} #}
+{% endfor %}{# {% for table in tables %} #}
+
+{% if views -%}
+# Views
+
+{% for view in views %}
+## {{ view['TABLE_NAME'] }}
+
+{% if view['IS_UPDATABLE'] == 'YES' %}**Updatable view**{% endif %}
+
+```sql
+{{ view['VIEW_DEFINITION'] }}
+```
+
+**Name**: {{ view['TABLE_NAME']|indent }}
+
+**Schema**: {{ view['TABLE_SCHEMA'] }}
+
+{% endfor %}{# {% for view in views %} #}
+{% endif %}{# {% if views %} #}
+
+{% if functions -%}
+# Functions
+
+{% for func in functions %}
+## {{ func['ROUTINE_NAME'] }}
+
+**Schema**: {{ func['ROUTINE_SCHEMA'] }}
+
+**Type**: {{ func['ROUTINE_TYPE'] }}
+
+{% if func['ROUTINE_DEFINITION'] %}
+```sql
+{{ func['ROUTINE_DEFINITION'] }}
+```
+{% endif %}
+
+{% endfor %}
+
+{% endif %}
+
+{% if triggers -%}
+# Triggers
+
+{% for trig in triggers %}
+## {{ trig['TRIGGER_NAME'] }}
+
+**{{ trig['EVENT_OBJECT_TABLE']}} {{ trig['ACTION_TIMING']}} {{ trig['EVENT_MANIPULATION']}}**
+
+```sql
+{{ trig['ACTION_STATEMENT'] }}
+```
+
+**Name**: {{ trig['TRIGGER_NAME']|indent }}
+
+**Schema**: {{ trig['TRIGGER_SCHEMA'] }}
+
+**Table**: {{ trig['EVENT_OBJECT_TABLE'] }}
+
+**Type**: {{ trig['ACTION_TIMING'] }} {{ trig['EVENT_MANIPULATION']}}
+
+{% endfor %}{# {% for trig in triggers %} #}
+{% endif %}{# {% if triggers %} #}

@@ -1,3 +1,7 @@
+# 0.1.4
+
+-    New: Added support for MySQL
+
 # 0.1.3
 
 -    New: Added support for Microsoft SQL Server

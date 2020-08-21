@@ -1,0 +1,48 @@
+{# Input variables structure:
+
+tables (list) - list of dictionaries with info about tables;
+    'TABLE_SCHEMA' (string) - table schema name;
+    'TABLE_NAME' (string) - table name;
+    'TABLE_COMMENT' (str) - table comment (description);
+    'columns' (list) - list of dictionaries with info about each column;
+        'TABLE_NAME' (string) - table name;
+        'COLUMN_NAME' (string) - column name;
+        'ORDINAL_POSITION' (integer) - position of the column in table definition;
+        'IS_NULLABLE' (string) - 'Y' if column is nullable, 'N' otherwise;
+        'DATA_TYPE' (string) - column data type;
+        'COLUMN_DEFAULT' (string) - default value of column or '' if there's no.
+        'CHARACTER_MAXIMUM_LENGTH' (integer) - max length;
+        'NUMERIC_PRECISION' (integer) — maximum number of digits in value.
+                                        For numeric values;
+        'COLUMN_COMMENT' (string) - column comment (description);
+        'foreign_keys' (list) - list with info about foreign keys if this
+                                column refers to other column;
+            'CONSTRAINT_SCHEMA' (string) - constraint schema;
+            'COLUMN_NAME' (string) - name of the fk column;
+            'CONSTRAINT_NAME' (string) - name of the constraint for this fk;
+            'TABLE_NAME' (string) - column table name;
+            'REFERENCED_TABLE_SCHEMA' (string) - schema of the referenced table;
+            'REFERENCED_TABLE_NAME' (string) - name of the referenced table;
+            'REFERENCED_COLUMN_NAME' (string) - name of the referenced table column.
+
+#}
+# Database Scheme
+
+<plantuml>
+    @startuml
+{% for table in tables %}
+    object {{ table['TABLE_NAME'] }} {
+{% for column in table['columns'] -%}
+{{ column['COLUMN_NAME']|indent(8) }} [{{ column['DATA_TYPE'] }}]
+{% endfor %}{# {% for column in table['columns'] %} #}
+}{% endfor %}{# {% for table in tables %} #}
+
+{% for table in tables -%}
+{% for column in table['columns'] -%}
+{% for fk in column['foreign_keys'] %}
+{{ fk['TABLE_NAME']|indent }} --> {{ fk['REFERENCED_TABLE_NAME'] }} : {{ fk['REFERENCED_COLUMN_NAME'] }}
+{%- endfor -%}{# {% for fk in colulmn['foreign_keys'] %} #}
+{%- endfor -%}{# {% for column in table['columns'] %} #}
+{%- endfor -%}{# {% for table in tables %} #}
+    @enduml
+</plantuml>

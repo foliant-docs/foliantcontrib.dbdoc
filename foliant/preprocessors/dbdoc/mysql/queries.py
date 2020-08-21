@@ -1,4 +1,3 @@
-import psycopg2
 from abc import ABCMeta
 
 SCHEMA = 'schema'
@@ -13,7 +12,7 @@ class QueryBase(metaclass=ABCMeta):
     # sort_fields = {}
 
     def __init__(self,
-                 con: psycopg2.extensions.connection,
+                 con,
                  filters: dict = {}):
         self._con = con
         self._filters = self._resolve_filters(filters)
@@ -63,10 +62,10 @@ class QueryBase(metaclass=ABCMeta):
         return f'{field} NOT IN ({in_str})'
 
     def _regex(self, field: str, value: str) -> str:
-        return f"REGEXP_LIKE({field}, '{value}')"
+        return f"{field} REGEXP '{value}'"
 
     def _not_regex(self, field: str, value: str) -> str:
-        return f"NOT REGEXP_LIKE({field}, '{value}')"
+        return f"{field} NOT REGEXP '{value}'"
 
     def _eq(self, field: str, value) -> str:
         if type(value) == str:
@@ -81,14 +80,14 @@ class QueryBase(metaclass=ABCMeta):
     def _get_rows(self, sql) -> list:
         """Run query from sql param and return a list of dicts key=column name,
         value = field value"""
-        cur = self._con.cursor()
-        cur.execute(sql)
+        self._con.query(sql)
         result = []
-        keys = tuple((d[0] for d in cur.description))
-        for row in cur.fetchall():
+        query = self._con.store_result()
+        keys = tuple((d[0] for d in query.describe()))
+        for row in query.fetch_row(0):
             row_dict = {}
             for i in range(len(keys)):
-                row_dict[keys[i]] = row[i] or ''
+                row_dict[keys[i]] = row[i].decode() if row[i] else ''
             result.append(row_dict)
         return result
 
@@ -103,119 +102,100 @@ class QueryBase(metaclass=ABCMeta):
 class TablesQuery(QueryBase):
 
     base_query = '''SELECT
-      tab.OWNER,
-      tab.TABLE_NAME,
-      com.COMMENTS
-    FROM all_tables tab
-    LEFT JOIN USER_TAB_COMMENTS com
-           ON tab.TABLE_NAME = com.TABLE_NAME
-    WHERE 1 = 1
+    TABLE_SCHEMA,
+    TABLE_NAME,
+    TABLE_COMMENT
+    FROM information_schema.tables
+    WHERE TABLE_TYPE  = 'BASE TABLE'
     {filters}
-    ORDER BY tab.TABLE_NAME'''
+    ORDER BY TABLE_NAME'''
 
-    _filter_fields = {SCHEMA: 'tab.OWNER',
-                      TABLE_NAME: 'tab.TABLE_NAME'}
+    _filter_fields = {SCHEMA: 'TABLE_SCHEMA',
+                      TABLE_NAME: 'TABLE_NAME'}
 
 
 class ColumnsQuery(QueryBase):
 
     base_query = '''SELECT
-      col.TABLE_NAME,
-      col.COLUMN_ID,
-      col.COLUMN_NAME,
-      col.NULLABLE,
-      col.DATA_TYPE,
-      col.DATA_DEFAULT,
-      col.DATA_LENGTH,
-      col.DATA_PRECISION,
-      com.COMMENTS
-    FROM user_tab_columns col
-    JOIN all_tables tab
-      ON col.TABLE_NAME = tab.TABLE_NAME
-    LEFT JOIN user_col_comments com
-           ON col.TABLE_NAME = com.TABLE_NAME
-          AND col.COLUMN_NAME = com.COLUMN_NAME
-    WHERE 1=1
+        c.TABLE_NAME,
+        c.COLUMN_NAME,
+        c.ORDINAL_POSITION,
+        c.IS_NULLABLE,
+        c.DATA_TYPE,
+        c.COLUMN_DEFAULT,
+        c.CHARACTER_MAXIMUM_LENGTH,
+        c.NUMERIC_PRECISION,
+        c.COLUMN_COMMENT
+    FROM information_schema.tables t
+    JOIN information_schema.`COLUMNS` c
+      ON c.TABLE_SCHEMA = t.TABLE_SCHEMA
+     AND c.TABLE_NAME =t.TABLE_NAME
+    WHERE t.TABLE_TYPE = 'BASE TABLE'
     {filters}
-    ORDER BY col.TABLE_NAME, col.COLUMN_ID'''
+    ORDER BY c.TABLE_SCHEMA, c.TABLE_NAME, c.ORDINAL_POSITION'''
 
-    _filter_fields = {SCHEMA: 'tab.OWNER',
-                      TABLE_NAME: 'col.TABLE_NAME'}
+    _filter_fields = {SCHEMA: 'c.TABLE_SCHEMA',
+                      TABLE_NAME: 'c.TABLE_NAME'}
 
 
 class ForeignKeysQuery(QueryBase):
 
-    base_query = '''
-    SELECT
-        c.OWNER,
-        a.CONSTRAINT_NAME,
-        a.TABLE_NAME,
-        a.COLUMN_NAME,
-        c.R_OWNER as F_OWNER,
-        c_pk.TABLE_NAME as F_TABLE_NAME
-    FROM all_cons_columns a
-        JOIN all_constraints c
-          ON a.OWNER = c.OWNER
-         AND a.CONSTRAINT_NAME = c.CONSTRAINT_NAME
-        JOIN all_constraints c_pk
-          ON c.R_OWNER = c_pk.OWNER
-         AND c.R_CONSTRAINT_NAME = c_pk.CONSTRAINT_NAME
-    WHERE c.CONSTRAINT_TYPE = 'R'
+    base_query = '''SELECT
+        CONSTRAINT_SCHEMA,
+        CONSTRAINT_NAME,
+        TABLE_NAME,
+        COLUMN_NAME,
+        REFERENCED_TABLE_SCHEMA,
+        REFERENCED_TABLE_NAME,
+        REFERENCED_COLUMN_NAME
+    FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+    WHERE REFERENCED_COLUMN_NAME IS NOT NULL
     {filters}'''
 
 
 class FunctionsQuery(QueryBase):
 
     base_query = """SELECT
-        NAME,
-        TYPE,
-        OWNER,
-        RTRIM(XMLAGG(XMLELEMENT(E,TEXT).EXTRACT('//text()') ORDER BY LINE).GetClobVal(),',') AS SOURCE
-    FROM ALL_SOURCE
-    WHERE TYPE in ('FUNCTION', 'PROCEDURE')
+        ROUTINE_NAME,
+        ROUTINE_TYPE,
+        ROUTINE_SCHEMA,
+        ROUTINE_DEFINITION
+    FROM information_schema.ROUTINES r
+    WHERE 1=1
     {filters}
-    GROUP BY NAME, TYPE, OWNER
-    ORDER BY NAME"""
+    ORDER BY ROUTINE_NAME"""
 
-    _filter_fields = {SCHEMA: 'OWNER'}
+    _filter_fields = {SCHEMA: 'ROUTINE_SCHEMA'}
 
 
 class TriggersQuery(QueryBase):
 
     base_query = """SELECT
-        tr.OWNER,
-        tr.TRIGGER_NAME,
-        tr.TRIGGER_TYPE,
-        tr.TRIGGERING_EVENT,
-        tr.TABLE_OWNER,
-        tr.TABLE_NAME,
-        tr.DESCRIPTION,
-        tr.TRIGGER_BODY,
-        (SELECT
-            RTRIM(XMLAGG(XMLELEMENT(E,TEXT).EXTRACT('//text()') ORDER BY LINE).GetClobVal(),',') AS SOURCE
-        FROM all_source
-        WHERE TYPE = 'TRIGGER'
-          AND owner = tr.owner
-          AND name = tr.TRIGGER_NAME
-        GROUP BY name, TYPE, owner) AS SOURCE
-            FROM ALL_TRIGGERS tr
-            WHERE 1=1
-            {filters}
-            ORDER BY TABLE_NAME, trigger_name"""
+        TRIGGER_SCHEMA,
+        TRIGGER_NAME,
+        ACTION_TIMING,
+        EVENT_MANIPULATION,
+        EVENT_OBJECT_SCHEMA,
+        EVENT_OBJECT_TABLE,
+        ACTION_STATEMENT
+    FROM information_schema.TRIGGERS t
+    WHERE 1=1
+    {filters}
+    ORDER BY TRIGGER_SCHEMA, TRIGGER_NAME"""
 
-    _filter_fields = {SCHEMA: 'tr.OWNER'}
+    _filter_fields = {SCHEMA: 'TRIGGER_SCHEMA'}
 
 
 class ViewsQuery(QueryBase):
 
     base_query = """SELECT
-        OWNER,
-        VIEW_NAME,
-        TEXT,
-        TEXT_VC
-    FROM ALL_VIEWS
+        TABLE_SCHEMA,
+        TABLE_NAME,
+        VIEW_DEFINITION,
+        IS_UPDATABLE
+    FROM information_schema.VIEWS v
     WHERE 1=1
     {filters}
-    ORDER BY VIEW_NAME"""
+    ORDER BY TABLE_SCHEMA, TABLE_NAME"""
 
-    _filter_fields = {SCHEMA: 'OWNER'}
+    _filter_fields = {SCHEMA: 'TABLE_SCHEMA'}

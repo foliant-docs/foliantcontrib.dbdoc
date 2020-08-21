@@ -24,7 +24,8 @@ setup(
     package_data={
         'foliant.preprocessors.dbdoc.pgsql': ['templates/*.j2'],
         'foliant.preprocessors.dbdoc.oracle': ['templates/*.j2'],
-        'foliant.preprocessors.dbdoc.mssql': ['templates/*.j2']
+        'foliant.preprocessors.dbdoc.mssql': ['templates/*.j2'],
+        'foliant.preprocessors.dbdoc.mysql': ['templates/*.j2']
     },
     license='MIT',
     platforms='any',
@@ -36,6 +37,7 @@ setup(
         'psycopg2-binary',
         'cx_Oracle',
         'pyodbc',
+        'mysqlclient',
         'jinja2',
         'PyYAML'
     ],

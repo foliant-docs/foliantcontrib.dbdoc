@@ -1,4 +1,4 @@
-import pyodbc
+from MySQLdb import _mysql
 
 from copy import deepcopy
 from jinja2 import Template
@@ -16,11 +16,10 @@ def process(config, tag_options) -> str:
         'doc': True,
         'scheme': True,
         'host': 'localhost',
-        'port': '1433',
-        'dbname': 'TestDB',
-        'user': 'SA',
-        'password': '<YourStrong@Passw0rd>',
-        'driver': '{ODBC Driver 17 for SQL Server}',
+        'port': '3306',
+        'dbname': 'mysql',
+        'user': 'root',
+        'password': 'passwd',
         'components': [
             'tables',
             'functions',
@@ -45,23 +44,24 @@ def process(config, tag_options) -> str:
 
 def connect(options: CombinedOptions):
     """
-    Connect to MS SQL database using parameters from options.
+    Connect to Oracle database using parameters from options.
     Save connection object into self._con.
 
     options(CombinedOptions) — CombinedOptions object with options from tag
                                and config.
     """
-    connection_string = (
-        f"DRIVER={options['driver']};"
-        f"SERVER={options['host']},{options['port']};"
-        f"DATABASE={options['dbname']};"
-        f"UID={options['user']};PWD={options['password']}"
-    )
     logger.debug(
-        f"Trying to connect: {connection_string}"
+        f"Trying to connect: host={options['host']} port={options['port']}"
+        f" dbname={options['dbname']}, user={options['user']} "
+        f"password={options['password']}."
     )
-    con = pyodbc.connect(connection_string)
-    return con
+    return _mysql.connect(
+        host=options['host'],
+        port=options['port'],
+        user=options['user'],
+        passwd=options['password'],
+        db=options['dbname']
+    )
 
 
 def get_template(options: CombinedOptions, key: str, default_name: str):
@@ -156,6 +156,25 @@ def collect_tables(tables: list,
             )
             col['foreign_keys'] = fks_fltr
         table['columns'] = table_columns
+    return result
+
+
+def collect_functions(functions: list,
+                      parameters: list) -> list:
+    '''
+    Parse function and parameter query results got from db and add 'parameters'
+    key to each function filled with its parameters
+    '''
+
+    result = deepcopy(functions)
+    for func in result:
+        # get parameters for this function
+        function_params = list(
+            filter(
+                lambda x: x['specific_name'] == func['specific_name'], parameters
+            )
+        )
+        func['parameters'] = function_params
     return result
 
 
