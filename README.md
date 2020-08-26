@@ -79,7 +79,7 @@ preprocessors:
         port: 5432
         dbname: postgres
         user: postgres
-        password: ''
+        password: !env DBDOC_PASS
         doc: True
         scheme: True
         filters:
@@ -100,16 +100,18 @@ preprocessors:
 :   Database host address. Default: `localhost`
 
 `port`
-:   Database port. Default: `5432` for pgsql, `1521` for Oracle.
+:   Database port. Default: `5432` for pgsql, `1521` for Oracle, `1433` for MS SQL, `3306` for MySQL.
 
 `dbname`
-:   PostgreSQL database name. Default: `postgres` for pgsql, `orcl` for oracle.
+:   Database name. Default: `postgres` for pgsql, `orcl` for oracle, `mssql` for MS SQL, `mysql` for MySQL.
 
 `user`
-:   PostgreSQL user name. Default: `postgres` for pgsql, `hr` for oracle.
+:   Database user name. Default: `postgres` for pgsql, `hr` for oracle, `SA` for MS SQL, `root` for MySQL.
 
 `password`
-:   PostgreSQL user password. Default: `postgres` for pgsq, `oracle` for oracle.
+:   Database user password. Default: `postgres` for pgsql, `oracle` for oracle, `<YourStrong@Passw0rd>` for MS SQL, `passwd` for MySQL.
+
+> It is not secure to store plain text passwords in your config files. We recommend to use [environment variables](https://foliant-docs.github.io/docs/config/#env) to supply passwords
 
 `doc`
 :   If `true` — documentation will be generated. Set to `false` if you only want to draw a scheme of the database. Default: `true`
@@ -134,7 +136,7 @@ preprocessors:
 
 ## Usage
 
-DBDoc currently supports three database engines: Oracle, PostgreSQL and Microsoft SQL Server. To generate Oracle database documentation, add an `<oracle></oracle>` tag to a desired place of your chapter.
+DBDoc currently supports four database engines: Oracle, PostgreSQL, MySQL and Microsoft SQL Server. To generate Oracle database documentation, add an `<oracle></oracle>` tag to a desired place of your chapter.
 
 
 ```html

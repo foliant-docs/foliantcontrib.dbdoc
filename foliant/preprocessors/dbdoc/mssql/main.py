@@ -17,7 +17,7 @@ def process(config, tag_options) -> str:
         'scheme': True,
         'host': 'localhost',
         'port': '1433',
-        'dbname': 'TestDB',
+        'dbname': 'mssql',
         'user': 'SA',
         'password': '<YourStrong@Passw0rd>',
         'driver': '{ODBC Driver 17 for SQL Server}',
