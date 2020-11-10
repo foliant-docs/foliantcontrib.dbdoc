@@ -1,3 +1,7 @@
+# 0.1.5
+
+-    New: trusted_connection option for Microsoft SQL Server
+
 # 0.1.4
 
 -    New: Added support for MySQL

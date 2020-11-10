@@ -21,6 +21,7 @@ def process(config, tag_options) -> str:
         'user': 'SA',
         'password': '<YourStrong@Passw0rd>',
         'driver': '{ODBC Driver 17 for SQL Server}',
+        'trusted_connection': False,
         'components': [
             'tables',
             'functions',
@@ -51,12 +52,20 @@ def connect(options: CombinedOptions):
     options(CombinedOptions) — CombinedOptions object with options from tag
                                and config.
     """
-    connection_string = (
-        f"DRIVER={options['driver']};"
-        f"SERVER={options['host']},{options['port']};"
-        f"DATABASE={options['dbname']};"
-        f"UID={options['user']};PWD={options['password']}"
-    )
+    if options['trusted_connection']:
+        connection_string = (
+            f"DRIVER={options['driver']};"
+            f"SERVER={options['host']},{options['port']};"
+            f"DATABASE={options['dbname']};Trusted_Connection=yes"
+        )
+
+    else:
+        connection_string = (
+            f"DRIVER={options['driver']};"
+            f"SERVER={options['host']},{options['port']};"
+            f"DATABASE={options['dbname']};"
+            f"UID={options['user']};PWD={options['password']}"
+        )
     logger.debug(
         f"Trying to connect: {connection_string}"
     )
