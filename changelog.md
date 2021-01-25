@@ -1,3 +1,8 @@
+# 0.1.6
+
+-    Templates now support imports and includes from the same folder.
+-    Fix: Remove TEXT_VC field from Oracle views query, which is absent on some versions.
+
 # 0.1.5
 
 -    New: trusted_connection option for Microsoft SQL Server

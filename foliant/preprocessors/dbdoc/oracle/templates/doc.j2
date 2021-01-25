@@ -28,7 +28,6 @@ views (list) - list of dictionaries with info about views;
     'OWNER' (string) - schema where the view is declared;
     'VIEW_NAME' (string) — name of the view;
     'TEXT' (string) — source code of the view (LONG);
-    'TEXT_VC' (string) — source code of the view (VARCHAR2);
 
 functions (list) - list of dictionaries with info about stored functions;
     'NAME' (string) - name of the function;
@@ -74,8 +73,6 @@ column | nullable | type | descr | fkey
 ```sql
 {% if view['TEXT'] %}
 {{ view['TEXT'] }}
-{% else %}
-{{ view['TEXT_VC'] }}
 {% endif %}
 ```
 

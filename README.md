@@ -23,7 +23,7 @@ Currently supported databases:
 
 DBDoc generates documentation by querying database structure. That's why you will need client libraries installed on your computer before running the preprocessor.
 
-**PosgreSQL**
+**PostgreSQL**
 
 PostgreSQL will be installed automatically with the preprocessor.
 

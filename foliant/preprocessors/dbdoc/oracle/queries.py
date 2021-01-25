@@ -211,8 +211,8 @@ class ViewsQuery(QueryBase):
     base_query = """SELECT
         OWNER,
         VIEW_NAME,
-        TEXT,
-        TEXT_VC
+        TEXT
+        -- TEXT_VC
     FROM ALL_VIEWS
     WHERE 1=1
     {filters}
