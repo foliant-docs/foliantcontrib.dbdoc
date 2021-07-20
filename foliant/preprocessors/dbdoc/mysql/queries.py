@@ -1,5 +1,6 @@
 from abc import ABCMeta
 
+
 SCHEMA = 'schema'
 TABLE_NAME = 'table_name'
 

@@ -3,14 +3,17 @@ Preprocessor for Foliant documentation authoring tool.
 Generates documentation from PostgreSQL database structure,
 '''
 
-from foliant.preprocessors.utils.preprocessor_ext import (BasePreprocessorExt,
-                                                          allow_fail)
+from foliant.preprocessors.utils.preprocessor_ext import BasePreprocessorExt
+from foliant.preprocessors.utils.preprocessor_ext import allow_fail
 
-# from .pgsql.main import process as process_pgsql
-from .pgsql.main import PGSQLRenderer, set_up_logger as set_up_logger_pgsql
-from .oracle.main import OracleRenderer, set_up_logger as set_up_logger_oracle
-from .mssql.main import MSSQLRenderer, set_up_logger as set_up_logger_mssql
-from .mysql.main import MySQLRenderer, set_up_logger as set_up_logger_mysql
+from .mssql.main import MSSQLRenderer
+from .mssql.main import set_up_logger as set_up_logger_mssql
+from .mysql.main import MySQLRenderer
+from .mysql.main import set_up_logger as set_up_logger_mysql
+from .oracle.main import OracleRenderer
+from .oracle.main import set_up_logger as set_up_logger_oracle
+from .pgsql.main import PGSQLRenderer
+from .pgsql.main import set_up_logger as set_up_logger_pgsql
 
 
 class Preprocessor(BasePreprocessorExt):

@@ -1,3 +1,7 @@
+# 0.1.7
+
+-    New utils module.
+
 # 0.1.6
 
 -    Templates now support imports and includes from the same folder.

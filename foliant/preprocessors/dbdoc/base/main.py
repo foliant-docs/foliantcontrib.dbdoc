@@ -1,9 +1,12 @@
 import os
 
-from jinja2 import Environment, FileSystemLoader
-from pkg_resources import resource_filename
-from foliant.preprocessors.utils.combined_options import CombinedOptions
 from logging import getLogger
+from pkg_resources import resource_filename
+
+from jinja2 import Environment
+from jinja2 import FileSystemLoader
+
+from foliant.contrib.combined_options import CombinedOptions
 
 
 logger = getLogger('unbound.dbdoc.pgsql')

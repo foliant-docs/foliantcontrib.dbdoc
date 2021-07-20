@@ -1,10 +1,16 @@
 import cx_Oracle
 
 from copy import deepcopy
-from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 from logging import getLogger
-from .queries import (TablesQuery, ColumnsQuery, ForeignKeysQuery,
-                      FunctionsQuery, TriggersQuery, ViewsQuery)
+
+from .queries import ColumnsQuery
+from .queries import ForeignKeysQuery
+from .queries import FunctionsQuery
+from .queries import TablesQuery
+from .queries import TriggersQuery
+from .queries import ViewsQuery
+from foliant.preprocessors.dbdoc.base.main import DBRendererBase
+
 
 logger = getLogger('unbound.dbdoc.pgsql')
 

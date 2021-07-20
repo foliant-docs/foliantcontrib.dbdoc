@@ -26,7 +26,7 @@ tables (list) - list of dictionaries with info about tables;
 # Database Scheme
 
 <plantuml>
-    @startuml
+@startuml
 {% for table in tables %}
     object {{ table['TABLE_NAME'] }} {
 {% for column in table['columns'] -%}
@@ -41,5 +41,5 @@ tables (list) - list of dictionaries with info about tables;
 {%- endfor -%}{# {% for fk in colulmn['foreign_keys'] %} #}
 {%- endfor -%}{# {% for column in table['columns'] %} #}
 {%- endfor -%}{# {% for table in tables %} #}
-    @enduml
+@enduml
 </plantuml>

@@ -2,9 +2,14 @@ from MySQLdb import _mysql
 
 from copy import deepcopy
 from logging import getLogger
+
+from .queries import ColumnsQuery
+from .queries import ForeignKeysQuery
+from .queries import FunctionsQuery
+from .queries import TablesQuery
+from .queries import TriggersQuery
+from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
-from .queries import (TablesQuery, ColumnsQuery, ForeignKeysQuery,
-                      FunctionsQuery, TriggersQuery, ViewsQuery)
 
 logger = getLogger('unbound.dbdoc.pgsql')
 
