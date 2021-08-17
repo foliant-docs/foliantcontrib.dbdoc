@@ -1,8 +1,7 @@
-import psycopg2
-
 from copy import deepcopy
 from logging import getLogger
 
+from ..base.main import LibraryNotInstalledError
 from .queries import ColumnsQuery
 from .queries import ForeignKeysQuery
 from .queries import FunctionsQuery
@@ -39,6 +38,13 @@ class PGSQLRenderer(DBRendererBase):
         Connect to PostgreSQL database using parameters from options.
         Save connection object into self.con.
         """
+        try:
+            import psycopg2
+        except ModuleNotFoundError:
+            raise LibraryNotInstalledError(
+                'psycopg2 not installed. Please run `pip3 install psycopg2-binary`'
+            )
+
         logger.debug(
             f"Trying to connect: host={self.options['host']} port={self.options['port']}"
             f" dbname={self.options['dbname']}, user={self.options['user']} "

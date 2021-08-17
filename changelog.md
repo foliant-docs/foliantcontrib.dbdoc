@@ -1,3 +1,6 @@
+# 0.1.8
+-    DBMS python connectors are only imported on use.
+
 # 0.1.7
 
 -    New utils module.

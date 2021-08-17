@@ -12,6 +12,10 @@ from foliant.contrib.combined_options import CombinedOptions
 logger = getLogger('unbound.dbdoc.pgsql')
 
 
+class LibraryNotInstalledError(Exception):
+    pass
+
+
 class DBRendererBase:
     defaults = {}
     module_name = __name__

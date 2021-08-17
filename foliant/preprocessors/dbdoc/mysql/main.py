@@ -1,8 +1,7 @@
-from MySQLdb import _mysql
-
 from copy import deepcopy
 from logging import getLogger
 
+from ..base.main import LibraryNotInstalledError
 from .queries import ColumnsQuery
 from .queries import ForeignKeysQuery
 from .queries import FunctionsQuery
@@ -11,7 +10,7 @@ from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 
-logger = getLogger('unbound.dbdoc.pgsql')
+logger = getLogger('unbound.dbdoc.mysql')
 
 
 class MySQLRenderer(DBRendererBase):
@@ -37,6 +36,15 @@ class MySQLRenderer(DBRendererBase):
         Connect to Oracle database using parameters from options.
         Save connection object into self.con.
         """
+
+        try:
+            from MySQLdb import _mysql
+        except ModuleNotFoundError:
+            raise LibraryNotInstalledError(
+                'mysqlclient not installed. Please run `pip3 install mysqlclient` '
+                'and make sure that MySQL Client is installed on the machine'
+            )
+
         logger.debug(
             f"Trying to connect: host={self.options['host']} port={self.options['port']}"
             f" dbname={self.options['dbname']}, user={self.options['user']} "

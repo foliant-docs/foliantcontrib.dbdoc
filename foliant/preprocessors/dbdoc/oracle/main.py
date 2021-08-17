@@ -1,5 +1,3 @@
-import cx_Oracle
-
 from copy import deepcopy
 from logging import getLogger
 
@@ -9,10 +7,11 @@ from .queries import FunctionsQuery
 from .queries import TablesQuery
 from .queries import TriggersQuery
 from .queries import ViewsQuery
+from ..base.main import LibraryNotInstalledError
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 
 
-logger = getLogger('unbound.dbdoc.pgsql')
+logger = getLogger('unbound.dbdoc.oracle')
 
 
 class OracleRenderer(DBRendererBase):
@@ -38,6 +37,14 @@ class OracleRenderer(DBRendererBase):
         Connect to Oracle database using parameters from options.
         Save connection object into self.con.
         """
+        try:
+            import cx_Oracle
+        except ModuleNotFoundError:
+            raise LibraryNotInstalledError(
+                'cx_Oracle not installed. Please run `pip3 install cx_Oracle` '
+                'and make sure that Oracle Instant Client is installed on the machine'
+            )
+
         logger.debug(
             f"Trying to connect: host={self.options['host']} port={self.options['port']}"
             f" dbname={self.options['dbname']}, user={self.options['user']} "

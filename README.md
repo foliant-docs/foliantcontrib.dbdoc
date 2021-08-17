@@ -15,29 +15,45 @@ Currently supported databases:
 * **Microsoft SQL Server**,
 * **MySQL**.
 
-> **Important Notice**: We, here at Foliant, don't work with *all* of the databases mentioned above. That's why we cannot properly test the preprocessor's work with all of them. That's where we need your help: If you encounter ANY errors during build; if you are not getting enough information for your document in the template; if you can't make the filters work; or if you see any other anomaly, please [send us an issue](https://github.com/foliant-docs/foliantcontrib.dbdoc/issues) in GitHub. We will try to fix it as fast as we can. Thanks!
+> **Important Notice**: We, here at Foliant, don't work with *all* of the databases mentioned above. That's why we cannot thoroughly test the preprocessor's work with all of them. That's where we need your help: If you encounter *any* errors during build; if you are not getting enough information for your document in the template; if you can't make the filters work; or if you see any other anomaly, please [send us an issue](https://github.com/foliant-docs/foliantcontrib.dbdoc/issues) in GitHub. We will try to fix it as fast as we can. Thanks!
 
 ## Installation
 
 ### Prerequisites
 
-DBDoc generates documentation by querying database structure. That's why you will need client libraries installed on your computer before running the preprocessor.
+DBDoc generates documentation by querying database structure. That's why you will need client libraries and their Python connectors installed on your computer before running the preprocessor.
 
 **PostgreSQL**
 
-PostgreSQL will be installed automatically with the preprocessor.
+To install PostgreSQL simply run
+
+```bash
+$ pip3 install psycopg2-binary
+```
 
 **Oracle**
 
-Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags). So, if you are planning on using DBDoc to document Oracle databases, first install the [Instant Client](https://www.oracle.com/database/technologies/instant-client.html).
+Oracle libraries are proprietary, so we cannot include them even in our [Docker distribution](https://hub.docker.com/r/foliant/foliant/tags). So if you are planning on using DBDoc to document Oracle databases, first install the [Instant Client](https://www.oracle.com/database/technologies/instant-client.html).
 
 > If you search the web, you can find ways to install Oracle Instant Client inside your Docker image, just saying.
+
+Next install the Python connector for Oracle database
+
+```bash
+$ pip3 install cx_Oracle
+```
 
 **Microsoft SQL Server**
 
 On Windows you will need to install MS SQL Server.
 
 On Unix you will first need to install [unixODBC](http://www.unixodbc.org/), and then — the ODBC driver. Microsoft has a detailed instructions on how to install the driver [on Linux](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/installing-the-microsoft-odbc-driver-for-sql-server) and [on Mac](https://docs.microsoft.com/en-us/sql/connect/odbc/linux-mac/install-microsoft-odbc-driver-sql-server-macos).
+
+Install the Python connector for Microsoft SQL Server database
+
+```bash
+$ pip3 install pyodbc
+```
 
 **MySQL**
 
@@ -47,11 +63,17 @@ On Mac you can simply run
 $ brew install mysql
 ```
 
-On Linux you will have to install server and client packages, for example, with apt-get:
+On Linux you will have to install server and client packages, for example, with apt-get
 
 ```bash
-sudp apt-get update
+sudo apt-get update
 sudo apt-get install -y mysql-server libmysqlclient-dev
+```
+
+Finally, install the Python connector for Microsoft SQL Server database
+
+```bash
+$ pip3 install mysqlclient
 ```
 
 ### Preprocessor

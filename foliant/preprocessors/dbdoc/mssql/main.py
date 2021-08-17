@@ -1,8 +1,7 @@
-import pyodbc
-
 from copy import deepcopy
 from logging import getLogger
 
+from ..base.main import LibraryNotInstalledError
 from .queries import ColumnsQuery
 from .queries import ForeignKeysQuery
 from .queries import FunctionsQuery
@@ -11,7 +10,7 @@ from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 
-logger = getLogger('unbound.dbdoc.pgsql')
+logger = getLogger('unbound.dbdoc.mssql')
 
 
 class MSSQLRenderer(DBRendererBase):
@@ -39,6 +38,14 @@ class MSSQLRenderer(DBRendererBase):
         Connect to MS SQL database using parameters from options.
         Save connection object into self.con.
         """
+        try:
+            import pyodbc
+        except ModuleNotFoundError:
+            raise LibraryNotInstalledError(
+                'pyodbc not installed. Please run `pip3 install pyodbc` '
+                'and make sure that MS SQL Server is installed on the machine'
+            )
+
         if self.options['trusted_connection']:
             connection_string = (
                 f"DRIVER={self.options['driver']};"
