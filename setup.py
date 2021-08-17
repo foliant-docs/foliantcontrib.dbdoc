@@ -19,7 +19,6 @@ setup(
     version='0.1.8',
     author='Daniil Minukhin',
     author_email='ddddsa@gmail.com',
-    # package_dir={'': 'foliant/preprocessors/'},
     packages=find_namespace_packages(exclude=['*.test', 'foliant', '*.templates']),
     package_data={
         'foliant.preprocessors.dbdoc.pgsql': ['templates/*.j2'],
