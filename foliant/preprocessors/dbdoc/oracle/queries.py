@@ -129,7 +129,7 @@ class ColumnsQuery(QueryBase):
       col.DATA_LENGTH,
       col.DATA_PRECISION,
       com.COMMENTS
-    FROM user_tab_columns col
+    FROM all_tab_columns col
     JOIN all_tables tab
       ON col.TABLE_NAME = tab.TABLE_NAME
     LEFT JOIN user_col_comments com
