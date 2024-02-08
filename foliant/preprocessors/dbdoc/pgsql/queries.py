@@ -99,6 +99,28 @@ class QueryBase(metaclass=ABCMeta):
     def run(self):
         return self._get_rows(self.sql)
 
+class TablesQueryCustom(QueryBase):
+
+    base_query = '''SELECT
+        t.table_schema,
+        t.table_name AS relname,
+        pd.description
+    FROM
+    information_schema.tables AS t
+    LEFT JOIN
+    pg_catalog.pg_description AS pd
+    ON
+    (t.table_schema || '.' || t.table_name)::regclass = pd.objoid
+    AND pd.objsubid = 0
+    WHERE 1 = 1
+    {filters}
+    ORDER BY
+    t.table_name'''
+
+    _filter_fields = {SCHEMA: 'table_schema',
+                      TABLE_NAME: 't.table_name'}
+
+
 
 class TablesQuery(QueryBase):
 
@@ -117,6 +139,38 @@ class TablesQuery(QueryBase):
     _filter_fields = {SCHEMA: 'schemaname',
                       TABLE_NAME: 'st.relname'}
 
+class ColumnsQueryCustom(QueryBase):
+
+    base_query = '''SELECT
+    c.table_name,
+    c.ordinal_position,
+    c.column_name,
+    c.is_nullable,
+    c.data_type,
+    c.column_default,
+    c.character_maximum_length,
+    c.numeric_precision,
+    pd.description
+    FROM
+    information_schema.columns c
+    JOIN
+    information_schema.tables t
+    ON
+    t.table_schema = c.table_schema
+    AND t.table_name = c.table_name
+    LEFT JOIN
+    pg_catalog.pg_description pd
+    ON
+    (c.table_schema || '.' || c.table_name)::regclass = pd.objoid
+    AND pd.objsubid = c.ordinal_position
+    WHERE 1 = 1
+    {filters}
+    ORDER BY
+    c.table_name,
+    c.ordinal_position'''
+
+    _filter_fields = {SCHEMA: 'c.table_schema',
+                      TABLE_NAME: 'c.table_name'}
 
 class ColumnsQuery(QueryBase):
 

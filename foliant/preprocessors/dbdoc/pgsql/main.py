@@ -2,11 +2,11 @@ from copy import deepcopy
 from logging import getLogger
 
 from ..base.main import LibraryNotInstalledError
-from .queries import ColumnsQuery
+from .queries import ColumnsQuery, ColumnsQueryCustom
 from .queries import ForeignKeysQuery
 from .queries import FunctionsQuery
 from .queries import ParametersQuery
-from .queries import TablesQuery
+from .queries import TablesQuery, TablesQueryCustom
 from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
@@ -65,11 +65,11 @@ class PGSQLRenderer(DBRendererBase):
         components = self.options['components']
 
         if 'tables' in components:
-            q_tables = TablesQuery(self.con, filters)
+            q_tables = TablesQueryCustom(self.con, filters)
             logger.debug(f'Tables query:\n\n {q_tables.sql}')
             tables = q_tables.run()
 
-            q_columns = ColumnsQuery(self.con, filters)
+            q_columns = ColumnsQueryCustom(self.con, filters)
             logger.debug(f'Columns query:\n\n {q_columns.sql}')
             columns = q_columns.run()
 
