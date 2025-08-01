@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 from logging import getLogger
 
@@ -9,7 +10,7 @@ from .queries import TriggersQuery
 from .queries import ViewsQuery
 from ..base.main import LibraryNotInstalledError
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
-
+from foliant.utils import output
 
 logger = getLogger('unbound.dbdoc.oracle')
 
@@ -28,7 +29,8 @@ class OracleRenderer(DBRendererBase):
             'functions',
             'triggers',
             'views'
-        ]
+        ],
+        'strict': False
     }
     module_name = __name__
 
@@ -50,13 +52,22 @@ class OracleRenderer(DBRendererBase):
             f" dbname={self.options['dbname']}, user={self.options['user']} "
             f"password={self.options['password']}."
         )
-        self.con = cx_Oracle.connect(
-            f"{self.options['user']}/{self.options['password']}@"
-            f"{self.options['host']}:{self.options['port']}/"
-            f"{self.options['dbname']}",
-            encoding='UTF-8',
-            nencoding='UTF-8'
-        )
+        try:
+            self.con = cx_Oracle.connect(
+                f"{self.options['user']}/{self.options['password']}@"
+                f"{self.options['host']}:{self.options['port']}/"
+                f"{self.options['dbname']}",
+                encoding='UTF-8',
+                nencoding='UTF-8'
+            )
+        except cx_Oracle.Error as e:
+            msg = f"\nOracle database connection error: {e}"
+            if self.options['strict']:
+                logger.error(msg)
+                output(f"ERROR: {msg}")
+                os._exit(1)
+            else:
+                logger.debug(f"{msg}. Skipping.")
 
     def collect_datasets(self) -> dict:
 

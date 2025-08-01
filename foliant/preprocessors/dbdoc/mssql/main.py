@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 from logging import getLogger
 
@@ -9,6 +10,7 @@ from .queries import TablesQuery
 from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
+from foliant.utils import output
 
 logger = getLogger('unbound.dbdoc.mssql')
 
@@ -29,7 +31,8 @@ class MSSQLRenderer(DBRendererBase):
             'functions',
             'triggers',
             'views'
-        ]
+        ],
+        'strict': False
     }
     module_name = __name__
 
@@ -46,24 +49,34 @@ class MSSQLRenderer(DBRendererBase):
                 'and make sure that MS SQL Server is installed on the machine'
             )
 
-        if self.options['trusted_connection']:
-            connection_string = (
-                f"DRIVER={self.options['driver']};"
-                f"SERVER={self.options['host']},{self.options['port']};"
-                f"DATABASE={self.options['dbname']};Trusted_Connection=yes"
-            )
+        try:
+            if self.options['trusted_connection']:
+                connection_string = (
+                    f"DRIVER={self.options['driver']};"
+                    f"SERVER={self.options['host']},{self.options['port']};"
+                    f"DATABASE={self.options['dbname']};Trusted_Connection=yes"
+                )
 
-        else:
-            connection_string = (
-                f"DRIVER={self.options['driver']};"
-                f"SERVER={self.options['host']},{self.options['port']};"
-                f"DATABASE={self.options['dbname']};"
-                f"UID={self.options['user']};PWD={self.options['password']}"
+            else:
+                connection_string = (
+                    f"DRIVER={self.options['driver']};"
+                    f"SERVER={self.options['host']},{self.options['port']};"
+                    f"DATABASE={self.options['dbname']};"
+                    f"UID={self.options['user']};PWD={self.options['password']}"
+                )
+            logger.debug(
+                f"Trying to connect: {connection_string}"
             )
-        logger.debug(
-            f"Trying to connect: {connection_string}"
-        )
-        self.con = pyodbc.connect(connection_string)
+            self.con = pyodbc.connect(connection_string)
+            logger.debug("Successfully connected to the database")
+        except pyodbc.Error as e:
+            msg = f"\MS SQL database database connection error: {e}"
+            if self.options['strict']:
+                logger.error(msg)
+                output(f'ERROR: {msg}')
+                os._exit(1)
+            else:
+                logger.debug(f'{msg}. Skipping.')
 
     def collect_datasets(self) -> dict:
 

@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 from logging import getLogger
 
@@ -9,6 +10,7 @@ from .queries import TablesQuery
 from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
+from foliant.utils import output
 
 logger = getLogger('unbound.dbdoc.mysql')
 
@@ -27,7 +29,8 @@ class MySQLRenderer(DBRendererBase):
             'functions',
             'triggers',
             'views'
-        ]
+        ],
+       'strict': False
     }
     module_name = __name__
 
@@ -45,18 +48,27 @@ class MySQLRenderer(DBRendererBase):
                 'and make sure that MySQL Client is installed on the machine'
             )
 
-        logger.debug(
-            f"Trying to connect: host={self.options['host']} port={self.options['port']}"
-            f" dbname={self.options['dbname']}, user={self.options['user']} "
-            f"password={self.options['password']}."
-        )
-        self.con = _mysql.connect(
-            host=self.options['host'],
-            port=self.options['port'],
-            user=self.options['user'],
-            passwd=self.options['password'],
-            db=self.options['dbname']
-        )
+        try:
+            logger.debug(
+                f"Trying to connect: host={self.options['host']} port={self.options['port']}"
+                f" dbname={self.options['dbname']}, user={self.options['user']} "
+                f"password={self.options['password']}."
+            )
+            self.con = _mysql.connect(
+                host=self.options['host'],
+                port=self.options['port'],
+                user=self.options['user'],
+                passwd=self.options['password'],
+                db=self.options['dbname']
+            )
+        except _mysql.Error as e:
+            msg = f"\nMySQL database error: {e}"
+            if self.options['strict']:
+                logger.error(msg)
+                output(f'ERROR: {msg}')
+                os._exit(1)
+            else:
+                logger.debug(f'{msg}. Skipping.')
 
     def collect_datasets(self) -> dict:
 
