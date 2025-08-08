@@ -105,6 +105,7 @@ preprocessors:
         doc: True
         scheme: True
         strict: False
+        trusted_connection: False
         filters:
             ...
         doc_template: dbdoc.j2
@@ -144,6 +145,9 @@ preprocessors:
 
 `strict`
 :   If `true` — the build will fail if connection to database cannot be established. If `false` — the preprocessor will skip the tag with warning. Default: `false`
+
+`trusted_connection`
+:   Specific option for MS SQL Server. If true - will use Windows Authentication (Trusted Connection) instead of username/password. Default: false. Requires proper ODBC driver configuration.
 
 `filters`
 :   SQL-like operators for filtering the results. More info in the **Filters** section.
@@ -383,3 +387,28 @@ con = pyodbc.connect(
     "UID=Usernam;PWD=Password_0"
 )
 ```
+
+**Microsoft SQL Server Authentication Issues**
+
+When using MS SQL Server, you have two authentication options:
+
+1. SQL Server Authentication (username/password):
+
+    ```yaml
+    trusted_connection: false
+    user: your_username
+    password: your_password
+    ```
+
+2. Windows Authentication (Trusted Connection):
+
+    ```yaml
+    trusted_connection: true
+    # no user/password needed
+    ```
+
+For Windows Authentication to work:
+
+- Make sure your ODBC driver supports Trusted Connections.
+- The account running Foliant must have proper database permissions.
+- On Linux/Mac, you may need to configure Kerberos for cross-platform authentication.
