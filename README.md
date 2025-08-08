@@ -104,6 +104,7 @@ preprocessors:
         password: !env DBDOC_PASS
         doc: True
         scheme: True
+        strict: False
         filters:
             ...
         doc_template: dbdoc.j2
@@ -140,6 +141,9 @@ preprocessors:
 
 `scheme`
 :   If `true` — the platuml code for database scheme will be generated. Default: `true`
+
+`strict`
+:   If `true` — the build will fail if connection to database cannot be established. If `false` — the preprocessor will skip the tag with warning. Default: `false`
 
 `filters`
 :   SQL-like operators for filtering the results. More info in the **Filters** section.
