@@ -73,7 +73,7 @@ class MSSQLRenderer(DBRendererBase):
             msg = f"\MS SQL database database connection error: {e}"
             if self.options['strict']:
                 logger.error(msg)
-                output(f'ERROR: {msg}')
+                output(f'ERROR: {msg}. Exit.')
                 os._exit(1)
             else:
                 logger.debug(f'{msg}. Skipping.')

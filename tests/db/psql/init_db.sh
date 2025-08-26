@@ -1,6 +1,11 @@
+#!/bin/bash
+
+set -e
+
 container=${1:-testdb}
 network=${2:-testnetwork}
 
+docker rm -f ${container}
 docker run -d --name ${container} \
     --network ${network} \
     -e POSTGRES_PASSWORD=password \
@@ -9,4 +14,3 @@ docker run -d --name ${container} \
     -p 5432:5432 \
     postgres:15
 
-rm -rf init-scripts

@@ -317,6 +317,47 @@ If you wish to create your own template, the default ones may be a good starting
 * [Default **SQL Server doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 * [Default **SQL Server scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 
+## Tests
+
+For run tests, use:
+```bash
+./test_in_docker.sh --python-version "3.9" --db-type "mysql"
+```
+
+**Options:**
+`--python-version <python-version>` – Specifies Python version for test environment. Available_: 3.8, 3.9, 3.10 etc.
+
+`--db-type <db-type>` – Chooses database type for testing. Available_: mysql, psql.
+
+**Usage Examples**
+
+```bash
+# Basic usage with defaults
+./test_in_docker.sh
+
+# Specific Python and database
+./test_in_docker.sh --python-version "3.10" --db-type "psql"
+
+# Only change database type
+./test_in_docker.sh --db-type "mysql"
+
+# Only change Python version
+./test_in_docker.sh --python-version "3.9"
+```
+
+**What It Does:**
+1. Starts Docker container with specified Python version.
+2. Initializes chosen database type with test data.
+3. Runs test suite.
+4. Cleans up resources after completion.
+5. Returns exit code based on test results.
+
+**Notes**
+- Requires Docker installed;
+- Test data is automatically loaded from `test_data/` directory;
+- Results are displayed in console with color formatting;
+- Exit code 0 = success, 1 = test failures.
+
 ## Troubleshooting
 
 If you get errors during build, especially errors concerning connection to the database, you have to make sure that you are supplying the right parameters.

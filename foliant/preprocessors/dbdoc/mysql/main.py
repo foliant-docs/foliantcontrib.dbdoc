@@ -58,14 +58,14 @@ class MySQLRenderer(DBRendererBase):
                 host=self.options['host'],
                 port=self.options['port'],
                 user=self.options['user'],
-                passwd=self.options['password'],
-                db=self.options['dbname']
+                password=self.options['password'],
+                database=self.options['dbname']
             )
         except _mysql.Error as e:
             msg = f"\nMySQL database error: {e}"
             if self.options['strict']:
                 logger.error(msg)
-                output(f'ERROR: {msg}')
+                output(f'ERROR: {msg}. Exit.')
                 os._exit(1)
             else:
                 logger.debug(f'{msg}. Skipping.')
@@ -106,7 +106,6 @@ class MySQLRenderer(DBRendererBase):
             q_triggers = TriggersQuery(self.con, filters)
             logger.debug(f'Triggers query:\n\n {q_triggers.sql}')
             result['triggers'] = q_triggers.run()
-
         return result
 
     def collect_tables(self,

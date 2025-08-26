@@ -64,7 +64,7 @@ class OracleRenderer(DBRendererBase):
             msg = f"\nOracle database connection error: {e}"
             if self.options['strict']:
                 logger.error(msg)
-                output(f"ERROR: {msg}")
+                output(f'ERROR: {msg}. Exit.')
                 os._exit(1)
             else:
                 logger.debug(f"{msg}. Skipping.")

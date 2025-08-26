@@ -1,9 +1,9 @@
-# tests/test_dbdoc_basic.py
 from unittest import TestCase
+from unittest.mock import patch
 from foliant_test.preprocessor import PreprocessorTestFramework
 
-class TestDbdocBasic(TestCase):
-    """Basic tests"""
+class TestDbdocPostgres(TestCase):
+    """Postgres tests"""
     def setUp(self):
         self.ptf = PreprocessorTestFramework('dbdoc')
         self.ptf.options = {}
@@ -27,12 +27,10 @@ class TestDbdocBasic(TestCase):
                 'tables'
             ]
         }
-        # Входные файлы
+
         input_files = {
             'index.md': '# Database Documentation\n\n<pgsql></pgsql>'
         }
-
-        # Ожидаемые файлы с функцией проверки
         expected_files = {
             'index.md': '''# Database Documentation\n\n
 # Tables
@@ -51,8 +49,30 @@ email | YES | character varying |  |
 '''
         }
 
-        # Запускаем тест
         self.ptf.test_preprocessor(
             input_mapping=input_files,
             expected_mapping=expected_files
         )
+    def test_strict_mysql(self):
+        """mysql  test strict mode"""
+        self.ptf.options = {
+            'dbms': 'pgsql',
+            'host': 'invalid-host-name',
+            'host': 'testdb',
+            'dbname': 'testdb',
+            'user': 'postgres',
+            'password': 'password',
+            'port': 5432,
+            'strict': True
+        }
+
+        input_files = {
+            'index.md': '# Database Documentation\n\n<mysql></mysql>'
+        }
+
+        with patch('os._exit') as mock_exit:
+            result = self.ptf.test_preprocessor(
+            input_mapping=input_files,
+            expected_mapping=input_files
+        )
+        mock_exit.assert_called_once_with(1)
