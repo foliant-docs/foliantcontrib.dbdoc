@@ -27,8 +27,7 @@ class DBRendererBase:
         self.options = CombinedOptions(
             {
                 'config': self.config,
-                'tag': tag_options,
-                'strict': True
+                'tag': tag_options
             },
             priority='tag',
             defaults=self.defaults

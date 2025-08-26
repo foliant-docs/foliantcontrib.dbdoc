@@ -1,0 +1,33 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9']
+        db-type: ['psql']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Make scripts executable
+      run: |
+        chmod +x test_in_docker.sh
+        chmod +x test.sh
+        if [ -f "tests/db/${{ matrix.db-type }}/init_db.sh" ]; then
+          chmod +x "tests/db/${{ matrix.db-type }}/init_db.sh"
+        fi
+
+    - name: Run tests in Docker
+      run: |
+        ./test_in_docker.sh \
+          --python-version "${{ matrix.python-version }}" \
+          --db-type "${{ matrix.db-type }}"
