@@ -8,7 +8,7 @@ class TestDbdocPostgres(TestCase):
         self.ptf = PreprocessorTestFramework('dbdoc')
         self.ptf.options = {}
 
-    def test_simple_documentation(self):
+    def test_simple_documentation_pgsql(self):
         """pgsql test"""
         self.ptf.options = {
             'dbms': 'pgsql',
@@ -53,8 +53,8 @@ email | YES | character varying |  |
             input_mapping=input_files,
             expected_mapping=expected_files
         )
-    def test_strict_mysql(self):
-        """mysql  test strict mode"""
+    def test_strict_pgsql(self):
+        """pgsql test strict mode"""
         self.ptf.options = {
             'dbms': 'pgsql',
             'host': 'invalid-host-name',
@@ -67,7 +67,7 @@ email | YES | character varying |  |
         }
 
         input_files = {
-            'index.md': '# Database Documentation\n\n<mysql></mysql>'
+            'index.md': '# Database Documentation\n\n<pgsql></pgsql>'
         }
 
         with patch('os._exit') as mock_exit:

@@ -16,7 +16,7 @@ setup(
     description=SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    version='0.1.8',
+    version='0.1.9',
     author='Daniil Minukhin',
     author_email='ddddsa@gmail.com',
     packages=find_namespace_packages(exclude=['*.test', 'foliant', '*.templates']),

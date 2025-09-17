@@ -12,6 +12,7 @@ from ..base.main import LibraryNotInstalledError
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 from foliant.utils import output
 
+
 logger = getLogger('unbound.dbdoc.oracle')
 
 

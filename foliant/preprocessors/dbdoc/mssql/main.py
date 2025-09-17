@@ -12,6 +12,7 @@ from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
 from foliant.utils import output
 
+
 logger = getLogger('unbound.dbdoc.mssql')
 
 

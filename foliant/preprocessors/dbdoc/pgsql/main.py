@@ -1,3 +1,4 @@
+import os
 from copy import deepcopy
 from logging import getLogger
 
@@ -10,6 +11,7 @@ from .queries import TablesQuery
 from .queries import TriggersQuery
 from .queries import ViewsQuery
 from foliant.preprocessors.dbdoc.base.main import DBRendererBase
+from foliant.utils import output
 
 
 logger = getLogger('unbound.dbdoc.pgsql')
@@ -29,7 +31,8 @@ class PGSQLRenderer(DBRendererBase):
             'views',
             'functions',
             'triggers'
-        ]
+        ],
+        'strict': False
     }
     module_name = __name__
 
@@ -50,13 +53,23 @@ class PGSQLRenderer(DBRendererBase):
             f" dbname={self.options['dbname']}, user={self.options['user']} "
             f"password={self.options['password']}."
         )
-        self.con = psycopg2.connect(
-            f"host='{self.options['host']}' "
-            f"port='{self.options['port']}' "
-            f"dbname='{self.options['dbname']}' "
-            f"user='{self.options['user']}'"
-            f"password='{self.options['password']}'"
-        )
+
+        try:
+            self.con = psycopg2.connect(
+                f"host='{self.options['host']}' "
+                f"port='{self.options['port']}' "
+                f"dbname='{self.options['dbname']}' "
+                f"user='{self.options['user']}'"
+                f"password='{self.options['password']}'"
+            )
+        except psycopg2.Error as e:
+            msg = f"\nPostgreSQL database connection error: {e}"
+            if self.options['strict']:
+                logger.error(msg)
+                output(f'ERROR: {msg}. Exit.')
+                os._exit(1)
+            else:
+                logger.debug(f"{msg}. Skipping.")
 
     def collect_datasets(self) -> dict:
 
