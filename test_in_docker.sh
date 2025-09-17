@@ -4,7 +4,7 @@ set -e  # Exit on error
 
 # Default values
 PYTHON_VERSIONS=("3.8" "3.9")
-DB_TYPE=("psql" "mysql")
+DB_TYPE=("pgsql" "mysql")
 
 CONTAINER_NAME="testdb"
 NETWORK_NAME="testnetwork"
@@ -57,7 +57,7 @@ EOF
         echo "Running tests with Docker access..."
         docker rm -f test-foliant:${version} 2>/dev/null || true
         docker run --rm \
-            --network ${NETWORK_NAME}\
+            --network ${NETWORK_NAME} \
             -v "./:/app/" \
             -w /app \
             test-foliant:${version} \

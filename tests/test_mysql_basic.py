@@ -78,7 +78,7 @@ email | YES | varchar |  |
 
         with patch('os._exit') as mock_exit:
             result = self.ptf.test_preprocessor(
-            input_mapping=input_files,
-            expected_mapping=input_files
-        )
+                input_mapping=input_files,
+                expected_mapping=input_files
+            )
         mock_exit.assert_called_once_with(1)

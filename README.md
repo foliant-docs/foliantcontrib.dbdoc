@@ -327,7 +327,7 @@ For run tests, use:
 **Options:**
 `--python-version <python-version>` – Specifies Python version for test environment. Available_: 3.8, 3.9, 3.10 etc.
 
-`--db-type <db-type>` – Chooses database type for testing. Available_: mysql, psql.
+`--db-type <db-type>` – Chooses database type for testing. Available_: mysql, pgsql.
 
 **Usage Examples**
 
@@ -336,7 +336,7 @@ For run tests, use:
 ./test_in_docker.sh
 
 # Specific Python and database
-./test_in_docker.sh --python-version "3.10" --db-type "psql"
+./test_in_docker.sh --python-version "3.10" --db-type "pgsql"
 
 # Only change database type
 ./test_in_docker.sh --db-type "mysql"

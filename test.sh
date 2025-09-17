@@ -1,6 +1,6 @@
 #!/bin/bash
 
-db_type=${1-psql}
+db_type=${1-pgsql}
 
 # before testing make sure that you have installed the fresh version of preprocessor:
 pip3 install .

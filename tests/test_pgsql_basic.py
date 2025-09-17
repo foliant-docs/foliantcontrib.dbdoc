@@ -58,7 +58,6 @@ email | YES | character varying |  |
         self.ptf.options = {
             'dbms': 'pgsql',
             'host': 'invalid-host-name',
-            'host': 'testdb',
             'dbname': 'testdb',
             'user': 'postgres',
             'password': 'password',
@@ -72,7 +71,7 @@ email | YES | character varying |  |
 
         with patch('os._exit') as mock_exit:
             result = self.ptf.test_preprocessor(
-            input_mapping=input_files,
-            expected_mapping=input_files
-        )
+                input_mapping=input_files,
+                expected_mapping=input_files
+            )
         mock_exit.assert_called_once_with(1)
