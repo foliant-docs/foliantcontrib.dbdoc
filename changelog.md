@@ -1,3 +1,7 @@
+# 0.1.9
+-    Add: strict option.
+-    Add: tests.
+
 # 0.1.8
 -    DBMS python connectors are only imported on use.
 

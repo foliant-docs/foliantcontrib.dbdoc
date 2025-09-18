@@ -104,6 +104,8 @@ preprocessors:
         password: !env DBDOC_PASS
         doc: True
         scheme: True
+        strict: False
+        trusted_connection: False
         filters:
             ...
         doc_template: dbdoc.j2
@@ -140,6 +142,12 @@ preprocessors:
 
 `scheme`
 :   If `true` — the platuml code for database scheme will be generated. Default: `true`
+
+`strict`
+:   If `true` — the build will fail if connection to database cannot be established. If `false` — the preprocessor will skip the tag with warning. Default: `false`
+
+`trusted_connection`
+:   Specific option for MS SQL Server. If true - will use Windows Authentication (Trusted Connection) instead of username/password. Default: false. Requires proper ODBC driver configuration.
 
 `filters`
 :   SQL-like operators for filtering the results. More info in the **Filters** section.
@@ -309,6 +317,47 @@ If you wish to create your own template, the default ones may be a good starting
 * [Default **SQL Server doc** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 * [Default **SQL Server scheme** template.](https://github.com/foliant-docs/foliantcontrib.dbdoc/blob/master/foliant/preprocessors/dbdoc/mssql/templates/doc.j2)
 
+## Tests
+
+For run tests, use:
+```bash
+./test_in_docker.sh --python-version "3.9" --db-type "mysql"
+```
+
+**Options:**
+`--python-version <python-version>` – Specifies Python version for test environment. Available_: 3.8, 3.9, 3.10 etc.
+
+`--db-type <db-type>` – Chooses database type for testing. Available_: mysql, pgsql.
+
+**Usage Examples**
+
+```bash
+# Basic usage with defaults
+./test_in_docker.sh
+
+# Specific Python and database
+./test_in_docker.sh --python-version "3.10" --db-type "pgsql"
+
+# Only change database type
+./test_in_docker.sh --db-type "mysql"
+
+# Only change Python version
+./test_in_docker.sh --python-version "3.9"
+```
+
+**What It Does:**
+1. Starts Docker container with specified Python version.
+2. Initializes chosen database type with test data.
+3. Runs test suite.
+4. Cleans up resources after completion.
+5. Returns exit code based on test results.
+
+**Notes**
+- Requires Docker installed;
+- Test data is automatically loaded from `test_data/` directory;
+- Results are displayed in console with color formatting;
+- Exit code 0 = success, 1 = test failures.
+
 ## Troubleshooting
 
 If you get errors during build, especially errors concerning connection to the database, you have to make sure that you are supplying the right parameters.
@@ -379,3 +428,28 @@ con = pyodbc.connect(
     "UID=Usernam;PWD=Password_0"
 )
 ```
+
+**Microsoft SQL Server Authentication Issues**
+
+When using MS SQL Server, you have two authentication options:
+
+1. SQL Server Authentication (username/password):
+
+    ```yaml
+    trusted_connection: false
+    user: your_username
+    password: your_password
+    ```
+
+2. Windows Authentication (Trusted Connection):
+
+    ```yaml
+    trusted_connection: true
+    # no user/password needed
+    ```
+
+For Windows Authentication to work:
+
+- Make sure your ODBC driver supports Trusted Connections.
+- The account running Foliant must have proper database permissions.
+- On Linux/Mac, you may need to configure Kerberos for cross-platform authentication.
