@@ -16,7 +16,7 @@ setup(
     description=SHORT_DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
-    version='0.1.9',
+    version='0.1.10',
     author='Daniil Minukhin',
     author_email='ddddsa@gmail.com',
     packages=find_namespace_packages(exclude=['*.test', 'foliant', '*.templates']),
@@ -30,7 +30,7 @@ setup(
     platforms='any',
     install_requires=[
         'foliant>=1.0.5',
-        'foliantcontrib.utils==1.0.3',
+        'foliantcontrib.utils>=1.0.2',
         'foliantcontrib.plantuml>=1.0.10',
         'jinja2',
         'PyYAML'
